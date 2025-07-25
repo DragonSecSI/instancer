@@ -1,0 +1,94 @@
+body {
+	font-family: monospace;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+header {
+	text-align: center;
+}
+
+
+section.content {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.challenges {
+	flex: none;
+	width: 30%;
+}
+
+.instances {
+	flex: 1;
+}
+
+.split>h2 {
+	text-align: center;
+}
+
+.spacer {
+	flex: 1;
+	width: 1%;
+}
+
+.hidden {
+	display: none;
+}
+
+.message {
+	text-align: center;
+	margin: 0 10%;
+	color: #0000aa;
+}
+
+.error {
+	text-align: center;
+	margin: 0 10%;
+	color: #ff0000;
+}
+
+
+.result {
+	display: flex;
+	margin: 4px 2em;
+}
+
+.result:hover {
+	background-color: #f0f0f0;
+}
+
+.result-id {
+	padding: 6px;
+	font-weight: bold;
+}
+
+.result-name {
+	padding: 6px;
+}
+
+.result-challenge {
+	padding: 6px;
+	font-style: italic;
+  color: #bbb;
+}
+
+.result-starttime {
+	padding: 6px;
+  color: #bbb;
+}
+
+.result-control {
+	margin-left: auto;
+	padding: 6px 12px;
+	text-align: center;
+	display: inline-block;
+	text-decoration: none;
+	cursor: pointer;
+	color: #000;
+}
+
+.instances.results.result {
+	cursor: pointer;
+}

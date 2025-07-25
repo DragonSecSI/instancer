@@ -1,0 +1,59 @@
+services:
+  
+  instancer:
+    image: instancer
+    build:
+      context: backend
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      KUBECONFIG: "/app/kubeconfig"
+      SERVER_ADDRESS: "0.0.0.0"
+      SERVER_PORT: "8080"
+      LOGS_LEVEL: "info"
+      LOGS_FILE: ""
+      LOGS_PRETTY: "true"
+      DATABASE_DIALECT: "postgres"
+      DATABASE_CONNECTION_STRING: "postgresql://instancer:instancer@db:5432/instancer?sslmode=disable"
+    volumes:
+      - ./config:/app/configs
+      - /Users/andraz/.kube/config:/app/kubeconfig:ro
+    depends_on:
+      - db
+      - registry
+
+  frontend:
+    image: instancer-frontend
+    build:
+      context: frontend
+    ports:
+      - "127.0.0.1:8000:80"
+    depends_on:
+      - instancer
+
+  db:
+    image: postgres:17
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: instancer
+      POSTGRES_PASSWORD: instancer
+      POSTGRES_DB: instancer
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  registry:
+    image: registry:2
+    ports:
+      - "127.0.0.1:5000:5000"
+    environment:
+      REGISTRY_STORAGE: "filesystem"
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: "/var/lib/registry"
+    volumes:
+      - registry_data:/var/lib/registry
+
+volumes:
+  db_data:
+    driver: local
+  registry_data:
+    driver: local

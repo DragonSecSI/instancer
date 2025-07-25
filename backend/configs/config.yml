@@ -1,0 +1,23 @@
+server:
+  address: "127.0.0.1"
+  port: 8080
+logs:
+  level: "info"
+  file: ""
+  pretty: true
+database:
+  dialect: "postgres"
+  connection_string: "postgresql://instancer:instancer@localhost:5432/instancer?sslmode=disable"
+app:
+  kubernetes:
+    auth_url: "https://10.113.6.20:6443"
+    auth_token: "./configs/token"
+    auth_cert: "./configs/ca.crt"
+    auth_ca: "./configs/ca.crt"
+    namespace: "default"
+  helm:
+    repository: "http://localhost:5000/charts"
+    basic_auth_username: "user"
+    basic_auth_password: "password"
+  initializer:
+    admin_password: "admin"
