@@ -1,0 +1,11 @@
+{{- if .Values.flag.path }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-flag
+  labels:
+    app.kubernetes.io/managed-by: "instancer"
+spec:
+  data:
+    flag: {{ .Values.flag.flag | quote }}
+{{- end }}

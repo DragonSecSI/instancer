@@ -37,7 +37,7 @@ func NewServer() (*Server, error) {
 
 		DB:              db,
 		Prefix:          "inst-",
-		CleanupDuration: time.Minute * 5,
+		CleanupDuration: time.Minute * 30,
 	}
 
 	return &Server{

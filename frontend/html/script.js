@@ -120,12 +120,12 @@ function render(challenges, instances) {
 		let result = document.createElement('div');
 		result.className = 'result';
 		result.onclick = () => {
-			let fqdn = instance.name + ".tls.vuln.si";
-			navigator.clipboard.writeText(fqdn).then(() => {
+			let conn = getConnectionString(instance.name, instance.type);
+			navigator.clipboard.writeText(conn).then(() => {
 				let message = document.getElementById('message');
-				message.textContent = `FQDN copied to clipboard: ${fqdn}`;
+				message.textContent = `Connection string copied to clipboard: ${conn}`;
 			}).catch(err => {
-				console.error('Failed to copy FQDN to clipboard:', err);
+				console.error('Failed to copy connection string to clipboard:', err);
 			});
 		}
 
@@ -136,7 +136,7 @@ function render(challenges, instances) {
 
 		let resultName = document.createElement('div');
 		resultName.className = 'result-name';
-		resultName.textContent = instance.name + '.tls.vuln.si';
+		resultName.textContent = getFQDN(instance.name, instance.type);
 		result.appendChild(resultName);
 
 		let resultChallenge = document.createElement('div');
@@ -185,6 +185,32 @@ function startChallenge(challengeId) {
 		e.classList.remove('hidden');
 	} else {
     refresh();
+	}
+}
+
+function getFQDN(name, type) {
+	const baseWeb = 'web.vuln.si';
+	const baseSocket = 'tls.vuln.si';
+
+	if (type === 0) {
+		return `${name}.${baseWeb}`;
+	} else if (type === 1) {
+		return `${name}.${baseSocket}`;
+	} else {
+		return name;
+	}
+}
+
+function getConnectionString(name, type) {
+	const baseWeb = 'web.vuln.si';
+	const baseSocket = 'tls.vuln.si';
+
+	if (type === 0) {
+		return `https://${name}.${baseWeb}`;
+	} else if (type === 1) {
+		return `ncat --ssl ${name}.${baseSocket} 443`;
+	} else {
+		return name;
 	}
 }
 

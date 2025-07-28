@@ -15,10 +15,11 @@ type Instance struct {
 	Name string `gorm:"not null;uniqueIndex"`
 	Flag string `gorm:"not null;uniqueIndex"`
 
-	TeamID      uint      `gorm:"not null;index"`
-	Team        Team      `gorm:"foreignKey:TeamID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	ChallengeID uint      `gorm:"not null;index"`
-	Challenge   Challenge `gorm:"foreignKey:ChallengeID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	TeamID        uint          `gorm:"not null;index"`
+	Team          Team          `gorm:"foreignKey:TeamID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	ChallengeID   uint          `gorm:"not null;index"`
+	Challenge     Challenge     `gorm:"foreignKey:ChallengeID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	ChallengeType ChallengeType `gorm:"not null"`
 
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`

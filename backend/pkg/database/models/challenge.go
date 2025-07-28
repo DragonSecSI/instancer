@@ -19,13 +19,22 @@ const (
 	ChallengeFlagTypeCombined
 )
 
+type ChallengeType int
+
+const (
+	ChallengeTypeWeb ChallengeType = iota
+	ChallengeTypeSocket
+)
+
 type Challenge struct {
-	ID          uint              `gorm:"primaryKey"`
-	Name        string            `gorm:"not null;uniqueIndex"`
-	Description string            `gorm:"not null"`
-	Flag        string            `gorm:"not null"`
-	FlagType    ChallengeFlagType `gorm:"not null"`
-	Duration    int               `gorm:"not null"`
+	ID          uint          `gorm:"primaryKey"`
+	Name        string        `gorm:"not null;uniqueIndex"`
+	Description string        `gorm:"not null"`
+	Type        ChallengeType `gorm:"not null"`
+
+	Flag     string            `gorm:"not null"`
+	FlagType ChallengeFlagType `gorm:"not null"`
+	Duration int               `gorm:"not null"`
 
 	Repository   string `gorm:"not null"`
 	Chart        string `gorm:"not null"`

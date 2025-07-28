@@ -72,8 +72,17 @@ func leetify(input string) string {
 		'G': '9',
 	}
 
+	bracket := strings.Index(input, "{")
+	if bracket == -1 {
+		bracket = 0
+	}
+
 	var result strings.Builder
-	for _, char := range input {
+	for i, char := range input {
+		if i <= bracket {
+			result.WriteRune(char)
+			continue
+		}
 		if replacement, exists := replacements[char]; exists {
 			if rand.Float32() < 0.5 {
 				result.WriteRune(replacement)
@@ -89,8 +98,18 @@ func leetify(input string) string {
 }
 
 func capitalize(input string) string {
+	bracket := strings.Index(input, "{")
+	if bracket == -1 {
+		bracket = 0
+	}
+
 	var result strings.Builder
-	for _, char := range input {
+	for i, char := range input {
+		if i <= bracket {
+			result.WriteRune(char)
+			continue
+		}
+
 		if rand.Float32() < 0.5 {
 			if char >= 'a' && char <= 'z' {
 				result.WriteRune(char - 32) // Convert to uppercase

@@ -1,0 +1,15 @@
+name: "pwn-demo-3"
+description: "A demo for pwn challenges"
+type: "socket" # or "web"
+flag: "flag{demo_pwn_flag}"
+flag_type: "combined" # or "static", "suffix", "leetify", "capitalize"
+duration: 1800 # currently unused
+repository: "oci://registry:5000/charts"
+chart: "pwn" # The same as the charts folder name
+chart_version: "0.1.0"
+values: |
+  image.repository=ghcr.io/dragonsecsi/dctfsi-2025/pwn/flagmanager
+  image.tag=latest
+  image.pullPolicy=Always
+  flag.envkey=FLAG_DEMO
+  flag.path=/flag_demo.txt

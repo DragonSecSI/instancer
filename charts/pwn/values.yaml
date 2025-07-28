@@ -1,0 +1,27 @@
+image:
+  repository: ghcr.io/dragonsecsi/dctfsi-2025/pwn/flagmanager
+  pullPolicy: Always
+  tag: latest
+
+imagePullSecrets:
+  - name: ghcr
+
+pod:
+  annotations: {}
+  labels: {}
+  port: 1337
+
+deployment:
+  annotations: {}
+  labels: {}
+
+service:
+  annotations: {}
+  labels: {}
+  type: ClusterIP
+  port: 1337
+
+flag:
+  flag: "flag{unset}"
+  envkey: "FLAG" # If set, the flag will be injected to this environment variable
+  path: "/flag.txt" # If set, the flag will be written to this file path

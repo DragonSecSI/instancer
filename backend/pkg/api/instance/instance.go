@@ -3,6 +3,7 @@ package instance
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ggicci/httpin"
 	"github.com/go-chi/chi/v5"
@@ -169,21 +170,19 @@ func (rs InstanceApi) NewInstance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flag := challenge.Flag
-	if challenge.FlagType == models.ChallengeFlagTypeLeetify || challenge.FlagType == models.ChallengeFlagTypeCombined {
-		flag = helpers.Flag.Leetify(flag)
-	}
-	if challenge.FlagType == models.ChallengeFlagTypeSuffix || challenge.FlagType == models.ChallengeFlagTypeCombined {
-		flag = helpers.Flag.Suffix(flag)
+	flag := helpers.Flag.Process(challenge.Flag, challenge.FlagType)
+	values := strings.Split(strings.TrimSpace(challenge.Values), "\n")
+	if values[len(values)-1] == "" {
+		values[len(values)-1] = "flag.flag" + flag
+	} else {
+		values = append(values, "flag.flag="+flag)
 	}
 
 	err = rs.Instancer.NewInstance(instancer.InstancerConfig{
 		Name:       name,
 		Repository: fmt.Sprintf("%s/%s", challenge.Repository, challenge.Chart),
 		Version:    challenge.ChartVersion,
-		Values: []string{
-			fmt.Sprintf("flag=%s", flag),
-		},
+		Values:     values,
 	})
 	if err != nil {
 		rs.Logger.Error().Err(err).Msg("Failed to create new instance")
@@ -192,11 +191,12 @@ func (rs InstanceApi) NewInstance(w http.ResponseWriter, r *http.Request) {
 	}
 
 	instance := models.Instance{
-		Name:        name,
-		Flag:        flag,
-		TeamID:      team.ID,
-		ChallengeID: challenge.ID,
-		Active:      true,
+		Name:          name,
+		Flag:          flag,
+		TeamID:        team.ID,
+		ChallengeID:   challenge.ID,
+		ChallengeType: challenge.Type,
+		Active:        true,
 	}
 
 	err = models.InstanceCreate(rs.DB, &instance)
