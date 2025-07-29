@@ -1,5 +1,5 @@
 image:
-  repository: ghcr.io/dragonsecsi/dctfsi-2025/pwn/flagmanager
+  repository: ghcr.io/dragonsecsi/dctfsi-2025/web/bakery
   pullPolicy: Always
   tag: latest
 
@@ -9,7 +9,11 @@ imagePullSecrets:
 pod:
   annotations: {}
   labels: {}
-  port: 1337
+  port: 8000
+  env: []
+  # Example
+  #  - name: "DEMO"
+  #    value: "demo"
 
 deployment:
   annotations: {}
@@ -19,7 +23,15 @@ service:
   annotations: {}
   labels: {}
   type: ClusterIP
-  port: 1337
+  port: 80
+
+httproute:
+  annotations: {}
+  labels: {}
+  hostSuffix: "web.vuln.si"
+  gateway: "vuln"
+  httpSectionName: "http-web"
+  httpsSectionName: "https-web"
 
 volumes: []
   # Example

@@ -37,7 +37,10 @@ class InstancedFlagAudit(db.Model):
 
 class InstancedFlag(BaseFlag):
     name = "instanced"
-    templates = {}
+    templates = {
+        "create": "/plugins/ctfd-instancer/assets/flag/create.html",
+        "update": "/plugins/ctfd-instancer/assets/flag/edit.html",
+    }
 
     @staticmethod
     def compare(flag_obj, provided):
@@ -78,17 +81,17 @@ class InstancedFlag(BaseFlag):
             current_app.logger.error(f"Error verifying instanced flag via API: {e}")
             return False
 
-        # # Audit every submission, except exceptions
-        # with current_app.app_context():
-        #     audit = InstancedFlagAudit(
-        #         team_id=team_id,
-        #         user_id=user_id,
-        #         flag_submitted=provided,
-        #         correct=correct,
-        #         active_instance=active_instance,
-        #         wrong_team=wrong_team,
-        #     )
-        #     db.session.add(audit)
+        # Audit every submission, except exceptions
+        with current_app.app_context():
+            audit = InstancedFlagAudit(
+                team_id=team_id,
+                user_id=user_id,
+                flag_submitted=provided,
+                correct=correct,
+                active_instance=active_instance,
+                wrong_team=wrong_team,
+            )
+            db.session.add(audit)
         #     db.session.commit()
 
         return correct
@@ -114,6 +117,10 @@ def instancer_portal_redirect():
             token = record.token
         else:
             token = generate_token(user.name, user.id)
+            if token:
+                itt = InstancerTokenTable(team_id=None, user_id=user.id, token=token)
+                db.session.add(itt)
+                db.session.commit()
     else:  # Team mode
         team = get_current_team()
         if team:
@@ -122,6 +129,10 @@ def instancer_portal_redirect():
                 token = record.token
             else:
                 token = generate_token(team.name, team.id)
+                if token:
+                    itt = InstancerTokenTable(team_id=team.id, user_id=None, token=token)
+                    db.session.add(itt)
+                    db.session.commit()
 
     if token:
         instancer_base = INSTANCER_API_URL
@@ -164,7 +175,7 @@ def generate_token(name, remote_id):
     return None
 
 def load(app):
-    register_plugin_assets_directory(app, base_path='/plugins/ctfd_instancer/assets/')
+    register_plugin_assets_directory(app, base_path='/plugins/ctfd-instancer/assets/')
     app.register_blueprint(instancer_bp)
     register_user_page_menu_bar("Instancer", "/instancer")
     app.logger.info("CTFd Instancer plugin loaded.")

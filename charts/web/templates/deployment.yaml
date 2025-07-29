@@ -53,7 +53,7 @@ spec:
               drop:
                 - ALL
           ports:
-            - name: pwn
+            - name: web
               containerPort: {{ .Values.pod.port }}
               protocol: TCP
           {{- if or .Values.flag.envkey .Values.pod.env }}

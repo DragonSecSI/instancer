@@ -102,7 +102,7 @@ function render(challenges, instances) {
 		result.appendChild(resultName);
 
 		let resultControl = document.createElement('div');
-		resultControl.className = 'result-control';
+		resultControl.className = 'result-control result-right';
 		resultControl.onclick = () => {
 			startChallenge(challenge.id);
 		}
@@ -136,7 +136,7 @@ function render(challenges, instances) {
 
 		let resultName = document.createElement('div');
 		resultName.className = 'result-name';
-		resultName.textContent = getFQDN(instance.name, instance.type);
+		resultName.textContent = getFQDN(instance.name, instance.type) + ' 📋';
 		result.appendChild(resultName);
 
 		let resultChallenge = document.createElement('div');
@@ -145,7 +145,7 @@ function render(challenges, instances) {
 		result.appendChild(resultChallenge);
 
 		let resultStartTime = document.createElement('div');
-		resultStartTime.className = 'result-starttime';
+		resultStartTime.className = 'result-starttime result-right';
     resultStartTime.textContent = "[" + instance.created_at + "]";
 		result.appendChild(resultStartTime);
 

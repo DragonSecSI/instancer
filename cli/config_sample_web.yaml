@@ -1,0 +1,23 @@
+name: "web-demo"
+description: "A demo for web challenges"
+type: "web"
+flag: "flag{demo_web_flag}"
+flag_type: "combined" # or "static", "suffix", "leetify", "capitalize"
+duration: 1800 # currently unused
+repository: "oci://registry:5000/charts"
+chart: "web" # The same as the charts folder name
+chart_version: "0.1.0"
+values: |
+  image.repository=ghcr.io/dragonsecsi/dctfsi-2025/web/bakery
+  image.tag=latest
+  image.pullPolicy=Always
+  imagePullSecrets[0].name=ghcr
+  httproute.gateway=vuln
+  httproute.httpSectionName=http-web
+  httproute.httpsSectionName=https-web
+  volumes[0].name=db
+  volumes[0].path=/app/db
+  volumes[0].size=10Mi
+  flag.envkey=FLAG
+  flag.path.key=flag.txt
+  flag.path.dest=/app/flag.txt

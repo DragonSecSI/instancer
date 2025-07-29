@@ -80,13 +80,16 @@ section.content {
 }
 
 .result-control {
-	margin-left: auto;
 	padding: 6px 12px;
 	text-align: center;
 	display: inline-block;
 	text-decoration: none;
 	cursor: pointer;
 	color: #000;
+}
+
+.result-right {
+	margin-left: auto;
 }
 
 .instances.results.result {

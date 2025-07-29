@@ -20,6 +20,12 @@ if __name__ == "__main__":
     argparser.add_argument("--api", type=str, default="https://instancer.vuln.si", help="API URL")
     argparser.add_argument("--token", type=str, default="admin", help="API token for authentication")
     argparser.add_argument("--config", type=str, required=True, help="Path to the configuration file")
+    argparser.add_argument("--name", type=str, help="Name override for the challenge")
+    argparser.add_argument("--flag", type=str, help="Flag override for the challenge")
+    argparser.add_argument("--image", type=str, help="Image override for the challenge")
+    argparser.add_argument("--tag", type=str, help="Tag override for the challenge")
+    argparser.add_argument("--chart", type=str, help="Chart override for the challenge")
+    argparser.add_argument("--chart_version", type=str, help="Chart version override for the challenge")
 
     args = argparser.parse_args()
 
@@ -36,6 +42,13 @@ if __name__ == "__main__":
         print(f"An error occurred while reading the file: {e}")
         sys.exit(1)
 
+    values = challenge.get("values", "").strip.split("\n")
+    for i, value in enumerate(values):
+        if args.image and value.startswith("image.repository="):
+            values[i] = f"image.repository={args.image}"
+        if args.tag and value.startswith("image.tag="):
+            values[i] = f"image.tag={args.tag}"
+
     headers = {
         "Authorization": args.token,
     }
@@ -49,8 +62,17 @@ if __name__ == "__main__":
         "repository": challenge.get("repository", "oci://registry:5000/charts"),
         "chart": challenge["chart"],
         "chart_version": challenge["chart_version"],
-        "values": challenge.get("values", "").strip(),
+        "values": "\n".join(values),
     }
+    if args.name:
+        payload["name"] = args.name
+    if args.flag:
+        payload["flag"] = args.flag
+    if args.chart:
+        payload["chart"] = args.chart
+    if args.chart_version:
+        payload["chart_version"] = args.chart_version
+
     try:
         response = requests.post(f"{args.api}/api/v1/challenge/", headers=headers, json=payload)
         response.raise_for_status()

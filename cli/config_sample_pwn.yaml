@@ -1,4 +1,4 @@
-name: "pwn-demo-3"
+name: "pwn-demo"
 description: "A demo for pwn challenges"
 type: "socket" # or "web"
 flag: "flag{demo_pwn_flag}"
@@ -11,5 +11,7 @@ values: |
   image.repository=ghcr.io/dragonsecsi/dctfsi-2025/pwn/flagmanager
   image.tag=latest
   image.pullPolicy=Always
+  imagePullSecrets[0].name=ghcr
   flag.envkey=FLAG_DEMO
-  flag.path=/flag_demo.txt
+  flag.path.key=flag.txt
+  flag.path.dest=/app/flag.txt
