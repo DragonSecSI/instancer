@@ -1,3 +1,5 @@
+var config = {};
+
 function refreshTimed() {
 	refresh();
 	setTimeout(refreshTimed, 60000);
@@ -23,6 +25,19 @@ function refresh() {
 		e.classList.remove('hidden');
 		return;
 	}
+}
+
+function getConfig() {
+	let xhr = new XMLHttpRequest();
+	xhr.open('GET', '/api/v1/meta/conf', false);
+	xhr.send();
+
+	if (xhr.status !== 200) {
+		console.error(`Failed to load config: ${xhr.status} ${xhr.statusText}`);
+		throw new Error(`Failed to load config (${xhr.status})`);
+	}
+
+	config = JSON.parse(xhr.responseText);
 }
 
 function getToken() {
@@ -217,31 +232,26 @@ function startChallenge(challengeId) {
 }
 
 function getFQDN(name, type) {
-	const baseWeb = 'web.vuln.si';
-	const baseSocket = 'tls.vuln.si';
-
 	if (type === 0) {
-		return `${name}.${baseWeb}`;
+		return `${name}${config.web_suffix}`;
 	} else if (type === 1) {
-		return `${name}.${baseSocket}`;
+		return `${name}${config.socket_suffix}`;
 	} else {
 		return name;
 	}
 }
 
 function getConnectionString(name, type) {
-	const baseWeb = 'web.vuln.si';
-	const baseSocket = 'tls.vuln.si';
-
 	if (type === 0) {
-		return `https://${name}.${baseWeb}`;
+		return `https://${name}${config.web_suffix}`;
 	} else if (type === 1) {
-		return `ncat --ssl ${name}.${baseSocket} 443`;
+		return `ncat --ssl ${name}${config.socket_suffix} ${config.socket_port}`;
 	} else {
 		return name;
 	}
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+	getConfig();
 	refreshTimed();
 });

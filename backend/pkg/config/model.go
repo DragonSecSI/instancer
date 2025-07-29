@@ -27,6 +27,7 @@ type ConfigApp struct {
 	Kubernetes  ConfigAppKubernetes  `yaml:"kubernetes"`
 	Helm        ConfigAppHelm        `yaml:"helm"`
 	Initializer ConfigAppInitializer `yaml:"initializer"`
+	Meta        ConfigAppMeta        `yaml:"meta"`
 }
 
 type ConfigAppKubernetes struct {
@@ -45,4 +46,10 @@ type ConfigAppHelm struct {
 
 type ConfigAppInitializer struct {
 	AdminPassword string `yaml:"admin_password"`
+}
+
+type ConfigAppMeta struct {
+	WebSuffix    string `yaml:"web_suffix"`
+	SocketSuffix string `yaml:"socket_suffix"`
+	SocketPort   int    `yaml:"socket_port"`
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/DragonSecSI/instancer/backend/pkg/api/flag"
 	"github.com/DragonSecSI/instancer/backend/pkg/api/health"
 	"github.com/DragonSecSI/instancer/backend/pkg/api/instance"
+	"github.com/DragonSecSI/instancer/backend/pkg/api/meta"
 	"github.com/DragonSecSI/instancer/backend/pkg/config"
 	"github.com/DragonSecSI/instancer/backend/pkg/instancer"
 )
@@ -53,6 +54,12 @@ func (rs Api) Routes() chi.Router {
 		DB:     rs.DB,
 		Config: rs.Config,
 		Logger: rs.Logger.With().Str("module", "api/flag").Logger(),
+	}.Routes())
+
+	r.Mount("/meta", meta.MetaApi{
+		DB:     rs.DB,
+		Config: rs.Config,
+		Logger: rs.Logger.With().Str("module", "api/meta").Logger(),
 	}.Routes())
 
 	return r

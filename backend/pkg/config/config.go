@@ -88,6 +88,10 @@ func (c *Config) LoadDefaults() {
 	c.App.Helm.BasicAuthPassword = ""
 
 	c.App.Initializer.AdminPassword = ""
+
+	c.App.Meta.WebSuffix = ""
+	c.App.Meta.SocketSuffix = ""
+	c.App.Meta.SocketPort = 443
 }
 
 func (c *Config) LoadFile(path string) error {
@@ -192,6 +196,25 @@ func (c *Config) LoadEnv() error {
 		c.App.Initializer.AdminPassword = adminPassword
 	}
 
+	if webSuffix := os.Getenv("APP_META_WEB_SUFFIX"); webSuffix != "" {
+		c.App.Meta.WebSuffix = webSuffix
+	}
+
+	if socketSuffix := os.Getenv("APP_META_SOCKET_SUFFIX"); socketSuffix != "" {
+		c.App.Meta.SocketSuffix = socketSuffix
+	}
+
+	if socketPort := os.Getenv("APP_META_SOCKET_PORT"); socketPort != "" {
+		socketPortInt, err := strconv.Atoi(socketPort)
+		if err != nil {
+			return &errors.ConfigValueError{
+				Key: "APP_META_SOCKET_PORT",
+				Err: err,
+			}
+		}
+		c.App.Meta.SocketPort = socketPortInt
+	}
+
 	return nil
 }
 
@@ -221,6 +244,10 @@ func (c *Config) LoadArgs() error {
 	flag.StringVar(&c.App.Helm.BasicAuthPassword, "app.helm.basic_auth_password", c.App.Helm.BasicAuthPassword, "Helm chart repository basic auth password")
 
 	flag.StringVar(&c.App.Initializer.AdminPassword, "app.initializer.admin_password", c.App.Initializer.AdminPassword, "Admin password for the initializer")
+
+	flag.StringVar(&c.App.Meta.WebSuffix, "app.meta.web_suffix", c.App.Meta.WebSuffix, "Web suffix for the application")
+	flag.StringVar(&c.App.Meta.SocketSuffix, "app.meta.socket_suffix", c.App.Meta.SocketSuffix, "Socket suffix for the application")
+	flag.IntVar(&c.App.Meta.SocketPort, "app.meta.socket_port", c.App.Meta.SocketPort, "Socket port for the application")
 
 	flag.Parse()
 
@@ -278,6 +305,18 @@ func (c *Config) Validate() error {
 
 	if c.App.Initializer.AdminPassword == "" {
 		return fmt.Errorf("Admin password for the initializer is required")
+	}
+
+	if c.App.Meta.WebSuffix == "" {
+		return fmt.Errorf("Web suffix for the application is required")
+	}
+
+	if c.App.Meta.SocketSuffix == "" {
+		return fmt.Errorf("Socket suffix for the application is required")
+	}
+
+	if c.App.Meta.SocketPort <= 0 || c.App.Meta.SocketPort > 65535 {
+		return fmt.Errorf("Socket port for the application must be between 1 and 65535")
 	}
 
 	return nil

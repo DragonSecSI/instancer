@@ -21,3 +21,7 @@ app:
     basic_auth_password: "password"
   initializer:
     admin_password: "admin"
+  meta:
+    web_suffix: ".web.vuln.si"
+    socket_suffix: ".tls.vuln.si"
+    socket_port: 443
