@@ -59,6 +59,12 @@ section.content {
 	background-color: #f0f0f0;
 }
 
+.result-category>h3 {
+	font-size: 1.2em;
+  text-transform: capitalize;
+  letter-spacing: .1em;
+}
+
 .result-id {
 	padding: 6px;
 	font-weight: bold;

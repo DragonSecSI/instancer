@@ -16,6 +16,7 @@ type ChallengeRequest struct {
 type Challenge struct {
 	Name         string                   `json:"name"`
 	Description  string                   `json:"description"`
+	Category     string                   `json:"category"`
 	Type         models.ChallengeType     `json:"type"`
 	Flag         string                   `json:"flag"`
 	FlagType     models.ChallengeFlagType `json:"flag_type"`
@@ -30,6 +31,7 @@ func (c Challenge) ToModel() models.Challenge {
 	return models.Challenge{
 		Name:         c.Name,
 		Description:  c.Description,
+		Category:     c.Category,
 		Type:         c.Type,
 		Flag:         c.Flag,
 		FlagType:     c.FlagType,
@@ -49,6 +51,7 @@ type ChallengeResponse struct {
 	ID          uint                 `json:"id"`
 	Name        string               `json:"name"`
 	Description string               `json:"description"`
+	Category    string               `json:"category"`
 	Type        models.ChallengeType `json:"type"`
 	Duration    int                  `json:"duration"`
 }
@@ -60,6 +63,7 @@ func newChallengeResponseList(challs []models.Challenge) []ChallengeResponse {
 			ID:          chall.ID,
 			Name:        chall.Name,
 			Description: chall.Description,
+			Category:    chall.Category,
 			Type:        chall.Type,
 			Duration:    chall.Duration,
 		})
@@ -72,6 +76,7 @@ func newChallengeResponse(chall models.Challenge) ChallengeResponse {
 		ID:          chall.ID,
 		Name:        chall.Name,
 		Description: chall.Description,
+		Category:    chall.Category,
 		Type:        chall.Type,
 		Duration:    chall.Duration,
 	}

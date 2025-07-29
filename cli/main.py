@@ -21,6 +21,7 @@ if __name__ == "__main__":
     argparser.add_argument("--token", type=str, default="admin", help="API token for authentication")
     argparser.add_argument("--config", type=str, required=True, help="Path to the configuration file")
     argparser.add_argument("--name", type=str, help="Name override for the challenge")
+    argparser.add_argument("--category", type=str, help="Category override for the challenge")
     argparser.add_argument("--flag", type=str, help="Flag override for the challenge")
     argparser.add_argument("--image", type=str, help="Image override for the challenge")
     argparser.add_argument("--tag", type=str, help="Tag override for the challenge")
@@ -42,7 +43,7 @@ if __name__ == "__main__":
         print(f"An error occurred while reading the file: {e}")
         sys.exit(1)
 
-    values = challenge.get("values", "").strip.split("\n")
+    values = challenge.get("values", "").strip().split("\n")
     for i, value in enumerate(values):
         if args.image and value.startswith("image.repository="):
             values[i] = f"image.repository={args.image}"
@@ -55,6 +56,7 @@ if __name__ == "__main__":
     payload = {
         "name": challenge["name"],
         "description": challenge["description"],
+        "category": challenge.get("category", "General"),
         "type": chall_types[challenge["type"]],
         "flag": challenge["flag"],
         "flag_type": flag_types[challenge["flag_type"]],
@@ -66,6 +68,8 @@ if __name__ == "__main__":
     }
     if args.name:
         payload["name"] = args.name
+    if args.category:
+        payload["category"] = args.category
     if args.flag:
         payload["flag"] = args.flag
     if args.chart:

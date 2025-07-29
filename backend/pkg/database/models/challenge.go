@@ -30,6 +30,7 @@ type Challenge struct {
 	ID          uint          `gorm:"primaryKey"`
 	Name        string        `gorm:"not null;uniqueIndex"`
 	Description string        `gorm:"not null"`
+	Category    string        `gorm:"not null"`
 	Type        ChallengeType `gorm:"not null"`
 
 	Flag     string            `gorm:"not null"`

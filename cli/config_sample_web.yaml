@@ -1,5 +1,6 @@
 name: "web-demo"
 description: "A demo for web challenges"
+category: "web"
 type: "web"
 flag: "flag{demo_web_flag}"
 flag_type: "combined" # or "static", "suffix", "leetify", "capitalize"

@@ -1,5 +1,6 @@
 name: "pwn-demo"
 description: "A demo for pwn challenges"
+category: "pwn"
 type: "socket" # or "web"
 flag: "flag{demo_pwn_flag}"
 flag_type: "combined" # or "static", "suffix", "leetify", "capitalize"

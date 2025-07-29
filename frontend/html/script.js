@@ -84,32 +84,60 @@ function render(challenges, instances) {
 	let challs = document.getElementById('results-challenges');
 	challs.innerHTML = '';
 
-	let challsmap = {};
+	let categories = {"Other": []};
 	challenges.forEach(challenge => {
-		challsmap[challenge.id] = challenge;
-
-		let result = document.createElement('div');
-		result.className = 'result';
-
-		let resultId = document.createElement('div');
-		resultId.className = 'result-id';
-		resultId.textContent = "ID:"+challenge.id;
-		result.appendChild(resultId);
-
-		let resultName = document.createElement('div');
-		resultName.className = 'result-name';
-		resultName.textContent = challenge.name;
-		result.appendChild(resultName);
-
-		let resultControl = document.createElement('div');
-		resultControl.className = 'result-control result-right';
-		resultControl.onclick = () => {
-			startChallenge(challenge.id);
+		if (challenge.category == null || challenge.category == '') {
+			challenge.category = 'Other';
 		}
-		resultControl.textContent = '▶';
-		result.appendChild(resultControl);
+		if (!categories[challenge.category]) {
+			categories[challenge.category] = [];
+		}
+		categories[challenge.category].push(challenge);
+	});
 
-		challs.appendChild(result);
+	let sortedCategories = Object.keys(categories).sort((a, b) => {
+		if (a === 'Other') return 1; // Move "Other" to the end
+		if (b === 'Other') return -1;
+		return a.localeCompare(b);
+	});
+
+	let challsmap = {};
+	sortedCategories.forEach(category => {
+		let categoryDiv = document.createElement('div');
+		categoryDiv.className = 'result-category';
+
+		let h2 = document.createElement('h3');
+		h2.textContent = "> " + category;
+		categoryDiv.appendChild(h2);
+
+		categories[category].forEach(challenge => {
+			challsmap[challenge.id] = challenge;
+
+			let result = document.createElement('div');
+			result.className = 'result';
+
+			let resultId = document.createElement('div');
+			resultId.className = 'result-id';
+			resultId.textContent = "ID:"+challenge.id;
+			result.appendChild(resultId);
+
+			let resultName = document.createElement('div');
+			resultName.className = 'result-name';
+			resultName.textContent = challenge.name;
+			result.appendChild(resultName);
+
+			let resultControl = document.createElement('div');
+			resultControl.className = 'result-control result-right';
+			resultControl.onclick = () => {
+				startChallenge(challenge.id);
+			}
+			resultControl.textContent = '▶';
+			result.appendChild(resultControl);
+
+			categoryDiv.appendChild(result);
+		});
+	
+		challs.appendChild(categoryDiv);
 	});
 
   let insts = document.getElementById('results-instances');
