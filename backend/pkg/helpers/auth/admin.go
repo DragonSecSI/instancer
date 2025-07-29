@@ -10,5 +10,10 @@ type AuthAdmin struct {
 
 func authAdminIsAdmin(r *http.Request, token string) bool {
 	t := r.Header.Get("Authorization")
+	if t == token {
+		return true
+	}
+
+	t = r.URL.Query().Get("token")
 	return t == token
 }

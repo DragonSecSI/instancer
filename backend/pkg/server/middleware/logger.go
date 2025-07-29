@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
+	"github.com/DragonSecSI/instancer/backend/pkg/metrics"
 	"github.com/rs/zerolog"
 )
 
@@ -22,9 +24,12 @@ func Logger(l *zerolog.Logger) func(next http.Handler) http.Handler {
 
 			panicVal := recover()
 			if panicVal != nil {
+				metrics.ExceptionsCounter.Inc()
 				rw.statusCode = http.StatusInternalServerError
 				defer panic(panicVal)
 			}
+
+			metrics.RequestsCounter.WithLabelValues(r.Method, r.URL.Path, strconv.Itoa(rw.statusCode)).Inc()
 
 			logger.
 				Info().

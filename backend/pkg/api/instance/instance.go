@@ -15,6 +15,7 @@ import (
 	"github.com/DragonSecSI/instancer/backend/pkg/database/models"
 	"github.com/DragonSecSI/instancer/backend/pkg/helpers"
 	"github.com/DragonSecSI/instancer/backend/pkg/instancer"
+	"github.com/DragonSecSI/instancer/backend/pkg/metrics"
 	"github.com/DragonSecSI/instancer/backend/pkg/server/middleware"
 )
 
@@ -30,7 +31,7 @@ func (rs InstanceApi) Routes() chi.Router {
 
 	r.Use(middleware.AuthUserMiddleware(rs.DB))
 
-	r.Get("/", rs.ListInstances)
+	r.With(httpin.NewInput(InstanceListRequest{})).Get("/", rs.ListInstances)
 	r.With(httpin.NewInput(InstanceRequest{})).Get("/{id}", rs.GetInstance)
 	r.With(httpin.NewInput(InstanceRequest{})).Delete("/{id}", rs.DeleteInstance)
 	r.With(httpin.NewInput(InstanceRequest{})).Get("/new/{id}", rs.NewInstance)
@@ -47,7 +48,14 @@ func (rs InstanceApi) ListInstances(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	instances, err := models.InstanceGetByTeamID(rs.DB, team.ID)
+	req := r.Context().Value(httpin.Input).(*InstanceListRequest)
+	if ok := req.Validate(); !ok {
+		rs.Logger.Warn().Msg("Invalid request parameters for instance list")
+		helpers.Api.Response.JsonError(w, &rs.Logger, "Invalid request parameters", http.StatusBadRequest)
+		return
+	}
+
+	instances, err := models.InstanceGetByTeamID(rs.DB, team.ID, req.Page, req.Pagesize)
 	if err != nil {
 		rs.Logger.Error().Err(err).Msg("Failed to get instances for team")
 		helpers.Api.Response.JsonError(w, &rs.Logger, "Internal Server Error", http.StatusInternalServerError)
@@ -139,7 +147,7 @@ func (rs InstanceApi) NewInstance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	instances, err := models.InstanceGetByTeamID(rs.DB, team.ID)
+	instances, err := models.InstanceGetByTeamID(rs.DB, team.ID, 1, 500)
 	if err != nil {
 		rs.Logger.Error().Err(err).Msg("Failed to get instances for team")
 		helpers.Api.Response.JsonError(w, &rs.Logger, "Internal Server Error", http.StatusInternalServerError)
@@ -216,6 +224,8 @@ func (rs InstanceApi) NewInstance(w http.ResponseWriter, r *http.Request) {
 		helpers.Api.Response.JsonError(w, &rs.Logger, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
+	metrics.InstancesCreatedCounter.WithLabelValues(challenge.Name).Inc()
 
 	helpers.Api.Response.Json(w, &rs.Logger, InstanceNewResponse{
 		Name: instance.Name,

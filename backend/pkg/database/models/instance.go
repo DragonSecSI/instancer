@@ -54,9 +54,14 @@ func InstanceGetByID(db *gorm.DB, id uint) (*Instance, error) {
 	return &instance, nil
 }
 
-func InstanceGetByTeamID(db *gorm.DB, teamID uint) ([]Instance, error) {
+func InstanceGetByTeamID(db *gorm.DB, teamID uint, page int, pagesize int) ([]Instance, error) {
 	var instances []Instance
-	err := db.Where("team_id = ?", teamID).Order("id desc").Find(&instances).Error
+	err := db.
+		Scopes(database.Paginate(db, page, pagesize)).
+		Where("team_id = ?", teamID).
+		Order("id desc").
+		Find(&instances).
+		Error
 	if err != nil {
 		return nil, &errors.DatabaseQueryError{
 			Query: "InstanceGetByTeamID",

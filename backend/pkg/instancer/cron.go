@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/DragonSecSI/instancer/backend/pkg/database/models"
+	"github.com/DragonSecSI/instancer/backend/pkg/metrics"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/registry"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -63,6 +64,8 @@ func (inst *Instancer) CronRun() error {
 			}(inst, &instance)
 		}
 	}
+
+	metrics.InstancesDeletedCounter.Inc()
 
 	if count > 0 {
 		inst.Logger.Info().Int("instances_deleted", count).Msg("Instance cleanup completed")

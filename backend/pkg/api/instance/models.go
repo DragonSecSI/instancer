@@ -2,6 +2,21 @@ package instance
 
 import "github.com/DragonSecSI/instancer/backend/pkg/database/models"
 
+type InstanceListRequest struct {
+	Page     int `in:"query=page;default=1"`
+	Pagesize int `in:"query=pagesize;default=25"`
+}
+
+func (r *InstanceListRequest) Validate() bool {
+	if r.Page < 1 {
+		return false
+	}
+	if r.Pagesize < 1 || r.Pagesize > 100 {
+		return false
+	}
+	return true
+}
+
 type InstanceRequest struct {
 	ID uint `in:"path=id;required"`
 }

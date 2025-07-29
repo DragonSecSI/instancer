@@ -11,6 +11,7 @@ import (
 	"github.com/DragonSecSI/instancer/backend/pkg/config"
 	"github.com/DragonSecSI/instancer/backend/pkg/database/models"
 	"github.com/DragonSecSI/instancer/backend/pkg/helpers"
+	"github.com/DragonSecSI/instancer/backend/pkg/metrics"
 	"github.com/DragonSecSI/instancer/backend/pkg/server/middleware"
 )
 
@@ -61,6 +62,8 @@ func (rs AuthApi) TeamRegister(w http.ResponseWriter, r *http.Request) {
 		helpers.Api.Response.JsonError(w, &rs.Logger, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
+	metrics.TeamsCreatedCounter.Inc()
 
 	teamres := TeamRegisterResponse{
 		Token: token,
