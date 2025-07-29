@@ -1,7 +1,6 @@
 package instancer
 
 import (
-	"strings"
 	"time"
 
 	"github.com/DragonSecSI/instancer/backend/pkg/database/models"
@@ -37,47 +36,36 @@ func (inst *Instancer) CronRun() error {
 
 	actionConfig.RegistryClient = regClient
 
-	// List releases
-	releases, err := actionConfig.Releases.ListReleases()
+	// Get active instances
+	activeInstances, err := models.InstanceGetActive(inst.DB)
 	if err != nil {
-		inst.Logger.Error().Err(err).Msg("Failed to list Helm releases")
+		inst.Logger.Error().Err(err).Msg("Failed to get active instances")
 		return err
 	}
-	if releases == nil {
-		return nil // No releases to process
+
+	// Delete instances that are older than the cleanup duration
+	count := 0
+	for _, instance := range activeInstances {
+		if time.Since(instance.CreatedAt).Seconds() > float64(instance.Duration) {
+			inst.Logger.Info().Str("instance_name", instance.Name).Msg("Uninstalling instance")
+			count++
+			go func(inst *Instancer, instance *models.Instance) {
+				uninstall := action.NewUninstall(actionConfig)
+				_, err := uninstall.Run(instance.Name)
+				if err != nil {
+					inst.Logger.Error().Err(err).Msgf("Failed to uninstall instance: %s", instance.Name)
+				}
+
+				instance.Active = false
+				if err := models.InstanceUpdate(inst.DB, instance); err != nil {
+					inst.Logger.Error().Err(err).Msgf("Failed to update instance status for: %s", instance.Name)
+				}
+			}(inst, &instance)
+		}
 	}
 
-	// Delete releases that match the prefix
-	for _, release := range releases {
-		if strings.HasPrefix(release.Name, inst.Prefix) {
-			if time.Since(release.Info.LastDeployed.Time) > inst.CleanupDuration {
-				go func() {
-					uninstall := action.NewUninstall(actionConfig)
-					_, err := uninstall.Run(release.Name)
-					if err != nil {
-						inst.Logger.Error().Err(err).Msgf("Failed to uninstall release: %s", release.Name)
-					} else {
-						inst.Logger.Info().Msgf("Successfully uninstalled release: %s", release.Name)
-					}
-
-					instance, err := models.InstanceGetByName(inst.DB, release.Name)
-					if err != nil {
-						inst.Logger.Error().Err(err).Msgf("Failed to get instance by name: %s", release.Name)
-						return
-					}
-					if inst != nil {
-						instance.Active = false
-						if err := models.InstanceUpdate(inst.DB, instance); err != nil {
-							inst.Logger.Error().Err(err).Msgf("Failed to update instance status for: %s", release.Name)
-						} else {
-							inst.Logger.Info().Msgf("Updated instance status to inactive for: %s", release.Name)
-						}
-					} else {
-						inst.Logger.Warn().Msgf("Instance not found for release: %s", release.Name)
-					}
-				}()
-			}
-		}
+	if count > 0 {
+		inst.Logger.Info().Int("instances_deleted", count).Msg("Instance cleanup completed")
 	}
 
 	return nil

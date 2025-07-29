@@ -13,6 +13,7 @@ type InstanceResponse struct {
 	ChallengeType models.ChallengeType `json:"type"`
 	CreatedAt     string               `json:"created_at"`
 	Active        bool                 `json:"active"`
+	Duration      int                  `json:"duration"`
 }
 
 func newInstanceResponseList(instances []models.Instance) []InstanceResponse {
@@ -25,6 +26,7 @@ func newInstanceResponseList(instances []models.Instance) []InstanceResponse {
 			ChallengeType: instance.ChallengeType,
 			CreatedAt:     instance.CreatedAt.Format("2006-01-02 15:04:05"),
 			Active:        instance.Active,
+			Duration:      instance.Duration,
 		})
 	}
 	return responseList
@@ -38,6 +40,7 @@ func newInstanceResponse(instance models.Instance) InstanceResponse {
 		ChallengeType: instance.ChallengeType,
 		CreatedAt:     instance.CreatedAt.Format("2006-01-02 15:04:05"),
 		Active:        instance.Active,
+		Duration:      instance.Duration,
 	}
 }
 

@@ -70,8 +70,8 @@ spec:
           volumeMounts:
             {{- if .Values.flag.path }}
             - name: flag-volume
-              mountPath: {{ .Values.flag.path.dest }}
-              subPath: {{ .Values.flag.path.key }}
+              mountPath: {{ .Values.flag.path }}
+              subPath: {{ splitList "/" .Values.flag.path | last | quote }}
             {{- end }}
             {{- range .Values.volumes }}
             - name: {{ .name }}

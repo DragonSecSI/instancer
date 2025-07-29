@@ -7,7 +7,7 @@ logs:
   pretty: true
 database:
   dialect: "postgres"
-  connection_string: "postgresql://instancer:instancer@db:5432/instancer?sslmode=disable"
+  connection_string: "postgresql://instancer:instancer@db:5432/instancer?sslmode=disable&timezone=Europe%2FLjubljana"
 app:
   kubernetes:
     auth_url: "https://10.113.6.20:6443"

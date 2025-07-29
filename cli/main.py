@@ -8,12 +8,18 @@ chall_types = {
     "socket": 1,
 }
 flag_types = {
-    "static": 0,
     "suffix": 1,
     "leetify": 2,
-    "capitalize": 3,
-    "combined": 4,
+    "capitalize": 4,
 }
+
+def flag_parse_types(types):
+    flag_type = 0
+    for t in types:
+        if t == "":
+            continue
+        flag_type |= flag_types[t]
+    return flag_type
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description="Instancer CLI")
@@ -22,6 +28,7 @@ if __name__ == "__main__":
     argparser.add_argument("--config", type=str, required=True, help="Path to the configuration file")
     argparser.add_argument("--name", type=str, help="Name override for the challenge")
     argparser.add_argument("--category", type=str, help="Category override for the challenge")
+    argparser.add_argument("--duration", type=int, help="Duration override for the challenge in seconds")
     argparser.add_argument("--flag", type=str, help="Flag override for the challenge")
     argparser.add_argument("--image", type=str, help="Image override for the challenge")
     argparser.add_argument("--tag", type=str, help="Tag override for the challenge")
@@ -59,7 +66,7 @@ if __name__ == "__main__":
         "category": challenge.get("category", "General"),
         "type": chall_types[challenge["type"]],
         "flag": challenge["flag"],
-        "flag_type": flag_types[challenge["flag_type"]],
+        "flag_type": flag_parse_types(challenge["flag_type"]),
         "duration": challenge.get("duration", 1800),
         "repository": challenge.get("repository", "oci://registry:5000/charts"),
         "chart": challenge["chart"],
@@ -70,6 +77,8 @@ if __name__ == "__main__":
         payload["name"] = args.name
     if args.category:
         payload["category"] = args.category
+    if args.duration:
+        payload["duration"] = args.duration
     if args.flag:
         payload["flag"] = args.flag
     if args.chart:

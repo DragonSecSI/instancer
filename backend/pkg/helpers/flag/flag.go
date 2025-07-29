@@ -28,13 +28,13 @@ func process(flag string, flagType models.ChallengeFlagType) string {
 		return flag
 	}
 
-	if flagType == models.ChallengeFlagTypeCapitalize || flagType == models.ChallengeFlagTypeCombined {
+	if flagType&models.ChallengeFlagTypeCapitalize != 0 {
 		flag = capitalize(flag)
 	}
-	if flagType == models.ChallengeFlagTypeLeetify || flagType == models.ChallengeFlagTypeCombined {
+	if flagType&models.ChallengeFlagTypeLeetify != 0 {
 		flag = leetify(flag)
 	}
-	if flagType == models.ChallengeFlagTypeSuffix || flagType == models.ChallengeFlagTypeCombined {
+	if flagType&models.ChallengeFlagTypeSuffix != 0 {
 		flag = addSuffix(flag)
 	}
 
@@ -84,7 +84,7 @@ func leetify(input string) string {
 			continue
 		}
 		if replacement, exists := replacements[char]; exists {
-			if rand.Float32() < 0.5 {
+			if rand.Float32() < 0.4 {
 				result.WriteRune(replacement)
 			} else {
 				result.WriteRune(char)
@@ -110,18 +110,16 @@ func capitalize(input string) string {
 			continue
 		}
 
-		if rand.Float32() < 0.5 {
+		if rand.Float32() < 0.4 {
 			if char >= 'a' && char <= 'z' {
 				result.WriteRune(char - 32) // Convert to uppercase
-			} else {
-				result.WriteRune(char)
-			}
-		} else {
-			if char >= 'A' && char <= 'Z' {
+			} else if char >= 'A' && char <= 'Z' {
 				result.WriteRune(char + 32) // Convert to lowercase
 			} else {
 				result.WriteRune(char)
 			}
+		} else {
+			result.WriteRune(char)
 		}
 	}
 

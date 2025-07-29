@@ -99,10 +99,10 @@ function render(challenges, instances) {
 	let challs = document.getElementById('results-challenges');
 	challs.innerHTML = '';
 
-	let categories = {"Other": []};
+	let categories = {};
 	challenges.forEach(challenge => {
 		if (challenge.category == null || challenge.category == '') {
-			challenge.category = 'Other';
+			challenge.category = 'other';
 		}
 		if (!categories[challenge.category]) {
 			categories[challenge.category] = [];
@@ -111,8 +111,8 @@ function render(challenges, instances) {
 	});
 
 	let sortedCategories = Object.keys(categories).sort((a, b) => {
-		if (a === 'Other') return 1; // Move "Other" to the end
-		if (b === 'Other') return -1;
+		if (a === 'other') return 1; // Move "Other" to the end
+		if (b === 'other') return -1;
 		return a.localeCompare(b);
 	});
 
@@ -144,11 +144,15 @@ function render(challenges, instances) {
 			let resultControl = document.createElement('div');
 			resultControl.className = 'result-control result-right';
 			resultControl.onclick = () => {
-				startChallenge(challenge.id);
+				startInstance(challenge.id);
 			}
-			resultControl.textContent = '▶';
-			result.appendChild(resultControl);
 
+			let resultControlStart = document.createElement('span');
+			resultControlStart.className = 'result-control-entry result-clickable';
+			resultControlStart.textContent = '▶';
+			resultControl.appendChild(resultControlStart);
+
+			result.appendChild(resultControl);
 			categoryDiv.appendChild(result);
 		});
 	
@@ -158,11 +162,19 @@ function render(challenges, instances) {
   let insts = document.getElementById('results-instances');
 	insts.innerHTML = '';
 
-	instances.reverse();
 	instances.forEach(instance => {
 		let result = document.createElement('div');
 		result.className = 'result';
-		result.onclick = () => {
+
+		let resultId = document.createElement('div');
+		resultId.className = 'result-id';
+		resultId.textContent = "ID:"+instance.id;
+		result.appendChild(resultId);
+
+		let resultName = document.createElement('div');
+		resultName.className = 'result-name result-clickable';
+		resultName.textContent = getFQDN(instance.name, instance.type) + ' 📋';
+		resultName.onclick = () => {
 			let conn = getConnectionString(instance.name, instance.type);
 			navigator.clipboard.writeText(conn).then(() => {
 				let message = document.getElementById('message');
@@ -171,15 +183,6 @@ function render(challenges, instances) {
 				console.error('Failed to copy connection string to clipboard:', err);
 			});
 		}
-
-		let resultId = document.createElement('div');
-		resultId.className = 'result-id';
-		resultId.textContent = "ID:"+instance.id;
-		result.appendChild(resultId);
-
-		let resultName = document.createElement('div');
-		resultName.className = 'result-name';
-		resultName.textContent = getFQDN(instance.name, instance.type) + ' 📋';
 		result.appendChild(resultName);
 
 		let resultChallenge = document.createElement('div');
@@ -187,21 +190,48 @@ function render(challenges, instances) {
 		resultChallenge.textContent = challsmap[instance.challenge_id] ? "("+challsmap[instance.challenge_id].name+")" : '(Unknown Challenge)';
 		result.appendChild(resultChallenge);
 
-		let resultStartTime = document.createElement('div');
-		resultStartTime.className = 'result-starttime result-right';
-    resultStartTime.textContent = "[" + instance.created_at + "]";
-		result.appendChild(resultStartTime);
+
+		if (instance.active) {
+			let resultStartTime = document.createElement('div');
+			resultStartTime.className = 'result-starttime';
+			resultStartTime.textContent = "[" + getFuzzyDuration(instance.created_at, instance.duration) + "]";
+			result.appendChild(resultStartTime);
+		}
 
 		let resultControl = document.createElement('div');
-		resultControl.className = 'result-control';
-		resultControl.textContent = instance.active ? '🟢' : '🔴';
-		result.appendChild(resultControl);
+		resultControl.className = 'result-control result-right';
 
+		if (instance.active) {
+			let resultControlExtend = document.createElement('span');
+			resultControlExtend.className = 'result-control-entry result-clickable';
+			resultControlExtend.textContent = '🕓';
+			resultControlExtend.onclick = (e) => {
+				extendInstance(instance.id);
+			};
+			resultControl.appendChild(resultControlExtend);
+
+			let resultControlDelete = document.createElement('span');
+			resultControlDelete.className = 'result-control-entry result-clickable';
+			resultControlDelete.textContent = '🗑️';
+			resultControlDelete.onclick = (e) => {
+			  if (confirm('Are you sure you want to delete this instance?')) {
+					deleteInstance(instance.id);
+				}
+			};
+			resultControl.appendChild(resultControlDelete);
+		}
+
+		let resultControlStatus = document.createElement('span');
+		resultControlStatus.className = 'result-control-entry';
+		resultControlStatus.textContent = instance.active ? '🟢' : '🔴';
+		resultControl.appendChild(resultControlStatus);
+
+		result.appendChild(resultControl);
 		insts.appendChild(result);
 	});
 }
 
-function startChallenge(challengeId) {
+function startInstance(challengeId) {
 	let token = getToken();
   if (!token) {
 		let e = document.getElementById('error');
@@ -223,11 +253,62 @@ function startChallenge(challengeId) {
 		} else if (xhr.status === 404) {
 			e.textContent = '⚠️ Error: Challenge not found';
 		} else {
-			e.textContent = `⚠️ Error: Failed to start challenge (${xhr.status})`;
+			let error = xhr.responseText ? JSON.parse(xhr.responseText) : {"error": "Unknown error"};
+			e.textContent = `⚠️ Error: Failed to start challenge (${xhr.status}) ${error.error}`;
 		}
 		e.classList.remove('hidden');
 	} else {
     refresh();
+	}
+}
+
+function extendInstance(instanceId) {
+	let token = getToken();
+	if (!token) {
+		let e = document.getElementById('error');
+		e.textContent = '⚠️ Error: No token found';
+		e.classList.remove('hidden');
+		return;
+	}
+
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST', `/api/v1/instance/extend/${instanceId}`, false);
+	xhr.setRequestHeader('Authorization', token);
+	xhr.send();
+
+	if (xhr.status !== 200) {
+		let error = xhr.responseText ? JSON.parse(xhr.responseText) : {"error": "Unknown error"};
+		console.error(`Failed to extend instance: ${xhr.status} ${xhr.statusText}`);
+		let e = document.getElementById('error');
+		e.textContent = `⚠️ Error: Failed to extend instance (${xhr.status}) ${error.error}`;
+		e.classList.remove('hidden');
+	} else {
+		refresh();
+	}
+}
+
+function deleteInstance(instanceId) {
+	let token = getToken();
+	if (!token) {
+		let e = document.getElementById('error');
+		e.textContent = '⚠️ Error: No token found';
+		e.classList.remove('hidden');
+		return;
+	}
+
+	let xhr = new XMLHttpRequest();
+	xhr.open('DELETE', `/api/v1/instance/${instanceId}`, false);
+	xhr.setRequestHeader('Authorization', token);
+	xhr.send();
+
+	if (xhr.status !== 204) {
+		let error = xhr.responseText ? JSON.parse(xhr.responseText) : {"error": "Unknown error"};
+		console.error(`Failed to delete instance: ${xhr.status} ${xhr.statusText}`);
+		let e = document.getElementById('error');
+		e.textContent = `⚠️ Error: Failed to delete instance (${xhr.status}) ${error.error}`;
+		e.classList.remove('hidden');
+	} else {
+		refresh();
 	}
 }
 
@@ -249,6 +330,30 @@ function getConnectionString(name, type) {
 	} else {
 		return name;
 	}
+}
+
+function getFuzzyDuration(timestring, duration) {
+	let t = new Date(timestring.replace(' ', 'T') + 'Z');
+	if (isNaN(t.getTime())) {
+		console.error('Invalid date format:', timestring);
+		return 'Invalid date';
+	}
+
+	let diff = t.getTime() - new Date().getTime();
+	diff = Math.floor(diff / 1000);
+
+	let seconds = diff + duration;
+	if (seconds < 0) {
+		return 'Cleanup imminent';
+	}
+	
+	if (seconds < 60) {
+		return `${seconds}s remaining`;
+	} else if (seconds < 3600) {
+		return `${Math.floor(seconds / 60)}m remaining`;
+	}
+
+	return `${Math.floor(seconds / 3600)}h remaining`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

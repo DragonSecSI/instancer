@@ -2,9 +2,14 @@ name: "pwn-demo"
 description: "A demo for pwn challenges"
 category: "pwn"
 type: "socket" # or "web"
+
 flag: "flag{demo_pwn_flag}"
-flag_type: "combined" # or "static", "suffix", "leetify", "capitalize"
-duration: 1800 # currently unused
+flag_type: # Set any of the following to enable the flag mangling
+  - "suffix"
+  - "leetify"
+  - "capitalize"
+duration: 1800
+
 repository: "oci://registry:5000/charts"
 chart: "pwn" # The same as the charts folder name
 chart_version: "0.1.0"
@@ -13,6 +18,5 @@ values: |
   image.tag=latest
   image.pullPolicy=Always
   imagePullSecrets[0].name=ghcr
-  flag.envkey=FLAG_DEMO
-  flag.path.key=flag.txt
-  flag.path.dest=/app/flag.txt
+  flag.envkey=FLAG
+  flag.path=/app/flag.txt

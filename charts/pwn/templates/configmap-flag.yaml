@@ -6,5 +6,5 @@ metadata:
   labels:
     app.kubernetes.io/managed-by: "instancer"
 data:
-  {{ .Values.flag.path.key }}: {{ .Values.flag.flag | quote }}
+  {{ splitList "/" .Values.flag.path | last }}: {{ .Values.flag.flag | quote }}
 {{- end }}

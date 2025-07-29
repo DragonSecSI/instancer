@@ -23,12 +23,13 @@ type Instance struct {
 
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
-	Active    bool      `gorm:"not null;default:true"`
+	Active    bool      `gorm:"not null;index;default:true"`
+	Duration  int       `gorm:"not null;default:1800"`
 }
 
 func InstanceGetList(db *gorm.DB, page int, pagesize int) ([]Instance, error) {
 	var instances []Instance
-	err := db.Scopes(database.Paginate(db, page, pagesize)).Find(&instances).Error
+	err := db.Scopes(database.Paginate(db, page, pagesize)).Order("id desc").Find(&instances).Error
 	if err != nil {
 		return nil, &errors.DatabaseQueryError{
 			Query: "InstanceGetList",
@@ -55,7 +56,7 @@ func InstanceGetByID(db *gorm.DB, id uint) (*Instance, error) {
 
 func InstanceGetByTeamID(db *gorm.DB, teamID uint) ([]Instance, error) {
 	var instances []Instance
-	err := db.Where("team_id = ?", teamID).Find(&instances).Error
+	err := db.Where("team_id = ?", teamID).Order("id desc").Find(&instances).Error
 	if err != nil {
 		return nil, &errors.DatabaseQueryError{
 			Query: "InstanceGetByTeamID",
@@ -93,6 +94,18 @@ func InstanceGetByFlag(db *gorm.DB, flag string) (*Instance, error) {
 		}
 	}
 	return &instance, nil
+}
+
+func InstanceGetActive(db *gorm.DB) ([]Instance, error) {
+	var instances []Instance
+	err := db.Where("active = ?", true).Find(&instances).Error
+	if err != nil {
+		return nil, &errors.DatabaseQueryError{
+			Query: "InstanceGetActive",
+			Err:   err,
+		}
+	}
+	return instances, nil
 }
 
 func InstanceCreate(db *gorm.DB, instance *Instance) error {

@@ -12,11 +12,10 @@ import (
 type ChallengeFlagType int
 
 const (
-	ChallengeFlagTypeStatic ChallengeFlagType = iota
-	ChallengeFlagTypeSuffix
-	ChallengeFlagTypeLeetify
-	ChallengeFlagTypeCapitalize
-	ChallengeFlagTypeCombined
+	ChallengeFlagTypeStatic     ChallengeFlagType = 0
+	ChallengeFlagTypeSuffix     ChallengeFlagType = 1
+	ChallengeFlagTypeLeetify    ChallengeFlagType = 2
+	ChallengeFlagTypeCapitalize ChallengeFlagType = 4
 )
 
 type ChallengeType int

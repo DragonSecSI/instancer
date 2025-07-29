@@ -4,6 +4,10 @@ body {
 	margin: 0 auto;
 }
 
+main {
+	padding-top: 1em;
+}
+
 header {
 	text-align: center;
 }
@@ -86,12 +90,18 @@ section.content {
 }
 
 .result-control {
-	padding: 6px 12px;
+}
+
+.result-control-entry {
+	padding: 6px 6px;
 	text-align: center;
 	display: inline-block;
 	text-decoration: none;
-	cursor: pointer;
 	color: #000;
+}
+
+.result-clickable {
+	cursor: pointer;
 }
 
 .result-right {

@@ -2,9 +2,14 @@ name: "web-demo"
 description: "A demo for web challenges"
 category: "web"
 type: "web"
+
 flag: "flag{demo_web_flag}"
-flag_type: "combined" # or "static", "suffix", "leetify", "capitalize"
-duration: 1800 # currently unused
+flag_type: # Set any of the following to enable the flag mangling
+  - "suffix"
+  - "leetify"
+  - "capitalize"
+duration:
+
 repository: "oci://registry:5000/charts"
 chart: "web" # The same as the charts folder name
 chart_version: "0.1.0"
@@ -20,5 +25,4 @@ values: |
   volumes[0].path=/app/db
   volumes[0].size=10Mi
   flag.envkey=FLAG
-  flag.path.key=flag.txt
-  flag.path.dest=/app/flag.txt
+  flag.path=/app/flag.txt
