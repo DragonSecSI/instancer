@@ -2,6 +2,7 @@ name: "web-demo"
 description: "A demo for web challenges"
 category: "web"
 type: "web"
+remoteid: "2"
 
 flag: "flag{demo_web_flag}"
 flag_type: # Set any of the following to enable the flag mangling

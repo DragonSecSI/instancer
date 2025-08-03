@@ -14,6 +14,18 @@ pod:
   # Example
   #  - name: "DEMO"
   #    value: "demo"
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1337
+    runAsGroup: 1337
+    fsGroup: 1337
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
 
 deployment:
   annotations: {}

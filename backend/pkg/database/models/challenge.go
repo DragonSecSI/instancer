@@ -31,6 +31,7 @@ type Challenge struct {
 	Description string        `gorm:"not null"`
 	Category    string        `gorm:"not null"`
 	Type        ChallengeType `gorm:"not null"`
+	RemoteID    string        `gorm:"not null;uniqueIndex"`
 
 	Flag     string            `gorm:"not null"`
 	FlagType ChallengeFlagType `gorm:"not null"`

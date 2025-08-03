@@ -35,10 +35,10 @@ spec:
       {{- end }}
       automountServiceAccountToken: false
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 1337
-        runAsGroup: 1337
-        fsGroup: 1337
+        runAsNonRoot: {{ .Values.pod.securityContext.runAsNonRoot | default true }}
+        runAsUser: {{ .Values.pod.securityContext.runAsUser | default 1337 }}
+        runAsGroup: {{ .Values.pod.securityContext.runAsGroup | default 1337 }}
+        fsGroup: {{ .Values.pod.securityContext.fsGroup | default 1337 }}
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -78,6 +78,13 @@ spec:
               mountPath: {{ .path }}
             {{- end }}
           {{- end }}
+          resources:
+            requests:
+              memory: {{ .Values.pod.resources.requests.memory | default "64Mi" }}
+              cpu: {{ .Values.pod.resources.requests.cpu | default "5m" }}
+            limits:
+              memory: {{ .Values.pod.resources.limits.memory | default "64Mi" }}
+              cpu: {{ .Values.pod.resources.limits.cpu | default "50m" }}
       {{- if or .Values.flag.path .Values.volumes }}
       volumes:
         {{- if .Values.flag.path }}

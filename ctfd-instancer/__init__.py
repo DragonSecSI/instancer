@@ -63,6 +63,7 @@ class InstancedFlag(BaseFlag):
         payload = {
             "flag": provided,
             "remote_id": str(remote_id),
+            "challenge_id": str(flag_obj.challenge.id),
         }
 
         correct = False

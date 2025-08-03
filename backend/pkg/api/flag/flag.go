@@ -44,7 +44,11 @@ func (rs FlagApi) FlagSubmit(w http.ResponseWriter, r *http.Request) {
 	}
 	if instance == nil {
 		metrics.FlagsIncorrectCounter.Inc()
-		rs.Logger.Warn().Str("flag", req.Body.Flag).Msg("Flag not found")
+		rs.Logger.Warn().
+			Str("flag", req.Body.Flag).
+			Str("remote_id", req.Body.RemoteID).
+			Str("remote_challenge_id", req.Body.RemoteChallengeID).
+			Msg("Flag not found")
 		res := FlagSubmitResponse{
 			Correct:        false,
 			ActiveInstance: false,
@@ -54,27 +58,32 @@ func (rs FlagApi) FlagSubmit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	team, err := models.TeamGetByID(rs.DB, instance.TeamID)
-	if err != nil {
-		rs.Logger.Error().Err(err).Msg("Failed to get team by ID")
-		helpers.Api.Response.JsonError(w, &rs.Logger, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	if team == nil {
-		rs.Logger.Error().Uint("team_id", instance.TeamID).Msg("Team not found for instance")
-		helpers.Api.Response.JsonError(w, &rs.Logger, "Team not found", http.StatusInternalServerError)
+	if instance.Challenge.RemoteID != req.Body.RemoteChallengeID {
+		metrics.FlagsIncorrectCounter.Inc()
+		rs.Logger.Warn().
+			Str("flag", req.Body.Flag).
+			Str("remote_id", req.Body.RemoteID).
+			Str("remote_challenge_id", req.Body.RemoteChallengeID).
+			Str("instance", instance.Name).
+			Msg("Remote challenge ID does not match")
+		res := FlagSubmitResponse{
+			Correct:        false,
+			ActiveInstance: instance.Active,
+			WrongTeam:      instance.Team.RemoteID != req.Body.RemoteID,
+		}
+		helpers.Api.Response.Json(w, &rs.Logger, res)
 		return
 	}
 
 	metrics.FlagsCorrectCounter.Inc()
-	if team.RemoteID != req.Body.RemoteID {
+	if instance.Team.RemoteID != req.Body.RemoteID {
 		metrics.FlagsWrongCounter.Inc()
 	}
 
 	res := FlagSubmitResponse{
 		Correct:        true,
 		ActiveInstance: instance.Active,
-		WrongTeam:      team.RemoteID != req.Body.RemoteID,
+		WrongTeam:      instance.Team.RemoteID != req.Body.RemoteID,
 	}
 	helpers.Api.Response.Json(w, &rs.Logger, res)
 }

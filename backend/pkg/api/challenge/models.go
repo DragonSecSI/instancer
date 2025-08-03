@@ -18,6 +18,7 @@ type Challenge struct {
 	Description  string                   `json:"description"`
 	Category     string                   `json:"category"`
 	Type         models.ChallengeType     `json:"type"`
+	RemoteID     string                   `json:"remote_id"`
 	Flag         string                   `json:"flag"`
 	FlagType     models.ChallengeFlagType `json:"flag_type"`
 	Duration     int                      `json:"duration"`
@@ -33,6 +34,7 @@ func (c Challenge) ToModel() models.Challenge {
 		Description:  c.Description,
 		Category:     c.Category,
 		Type:         c.Type,
+		RemoteID:     c.RemoteID,
 		Flag:         c.Flag,
 		FlagType:     c.FlagType,
 		Duration:     c.Duration,

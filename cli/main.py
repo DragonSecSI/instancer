@@ -28,6 +28,7 @@ if __name__ == "__main__":
     argparser.add_argument("--config", type=str, required=True, help="Path to the configuration file")
     argparser.add_argument("--name", type=str, help="Name override for the challenge")
     argparser.add_argument("--category", type=str, help="Category override for the challenge")
+    argparser.add_argument("--remoteid", type=str, help="Remote challenge ID override for the challenge")
     argparser.add_argument("--duration", type=int, help="Duration override for the challenge in seconds")
     argparser.add_argument("--flag", type=str, help="Flag override for the challenge")
     argparser.add_argument("--image", type=str, help="Image override for the challenge")
@@ -65,6 +66,7 @@ if __name__ == "__main__":
         "description": challenge["description"],
         "category": challenge.get("category", "General"),
         "type": chall_types[challenge["type"]],
+        "remote_id": challenge.get("remoteid", ""),
         "flag": challenge["flag"],
         "flag_type": flag_parse_types(challenge["flag_type"]),
         "duration": challenge.get("duration", 1800),

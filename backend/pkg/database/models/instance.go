@@ -88,7 +88,7 @@ func InstanceGetByName(db *gorm.DB, name string) (*Instance, error) {
 
 func InstanceGetByFlag(db *gorm.DB, flag string) (*Instance, error) {
 	var instance Instance
-	err := db.Where("flag = ?", flag).First(&instance).Error
+	err := db.Preload("Team").Preload("Challenge").Where("flag = ?", flag).First(&instance).Error
 	if err != nil {
 		if goerrors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

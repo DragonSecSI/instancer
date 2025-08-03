@@ -10,6 +10,18 @@ pod:
   annotations: {}
   labels: {}
   port: 1337
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1337
+    runAsGroup: 1337
+    fsGroup: 1337
+  resources:
+    requests:
+      cpu: 5m
+      memory: 64Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
 
 deployment:
   annotations: {}

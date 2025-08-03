@@ -1,8 +1,9 @@
 package flag
 
 type FlagSubmit struct {
-	Flag     string `json:"flag"`
-	RemoteID string `json:"remote_id"`
+	Flag              string `json:"flag"`
+	RemoteID          string `json:"remote_id"`
+	RemoteChallengeID string `json:"remote_challenge_id"`
 }
 
 type FlagSubmitRequest struct {
