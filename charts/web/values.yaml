@@ -4,7 +4,7 @@ image:
   tag: latest
 
 imagePullSecrets:
-  - name: ghcr
+  - name: vuln
 
 pod:
   annotations: {}
@@ -53,7 +53,5 @@ volumes: []
 
 flag:
   flag: "flag{unset}"
-  envkey: "FLAG" # If set, the flag will be injected to this environment variable
-  path: # If set, the flag will be written to this file path. To disable, set to {}
-    key: "flag.txt"
-    dest: "/app/flag.txt" # Suffix must be the same as key
+  envkey: "" # If set, the flag will be injected to this environment variable
+  path: "" # If set, the flag will be written to this file path

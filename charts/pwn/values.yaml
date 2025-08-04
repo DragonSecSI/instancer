@@ -4,7 +4,7 @@ image:
   tag: latest
 
 imagePullSecrets:
-  - name: ghcr
+  - name: vuln
 
 pod:
   annotations: {}
@@ -41,5 +41,5 @@ volumes: []
 
 flag:
   flag: "flag{unset}"
-  envkey: "FLAG" # If set, the flag will be injected to this environment variable
-  path: "/app/flag.txt" # If set, the flag will be written to this file path
+  envkey: "" # If set, the flag will be injected to this environment variable
+  path: "" # If set, the flag will be written to this file path
