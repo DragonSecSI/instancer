@@ -1,0 +1,64 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+  <div class="container">
+    <h2 class="mt-4">Instancer Configuration</h2>
+    <form method="post" class="mb-3">
+      <div class="form-group">
+        <label for="INSTANCER_API_URL">Instancer API URL</label>
+        <input
+          type="text"
+          class="form-control"
+          name="INSTANCER_API_URL"
+          id="INSTANCER_API_URL"
+          value="{{ instancer_api_url or '' }}"
+          placeholder="https://instancer.example.com/api"
+          required
+        >
+        <small class="form-text text-muted">
+          Base URL for the instancer API. Used for calls like verification / instancing.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="INSTANCER_API_TOKEN">Instancer API Token</label>
+        <input
+          type="text"
+          class="form-control"
+          name="INSTANCER_API_TOKEN"
+          id="INSTANCER_API_TOKEN"
+          value="{{ instancer_api_token or '' }}"
+          placeholder="secret-token"
+        >
+        <small class="form-text text-muted">
+          Authentication token to include in requests to the instancer API.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="INSTANCER_PUBLIC_URL">Instancer Public URL</label>
+        <input
+          type="text"
+          class="form-control"
+          name="INSTANCER_PUBLIC_URL"
+          id="INSTANCER_PUBLIC_URL"
+          value="{{ instancer_public_url or '' }}"
+          placeholder="https://instancer.example.com/api"
+          required
+        >
+        <small class="form-text text-muted">
+          Public URL for the instancer API. Used for user redirection.
+        </small>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save</button>
+
+      {% if saved %}
+        <div class="alert alert-success mt-3" role="alert">
+          Settings saved.
+        </div>
+      {% endif %}
+    </form>
+  </div>
+{% endblock %}
+

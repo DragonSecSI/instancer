@@ -1,0 +1,164 @@
+{% extends "admin/challenges/update.html" %}
+
+{% block header %}
+{% endblock %}
+
+<form method="POST" action="{{ script_root }}/admin/challenges/{{ challenge.id }}/edit" enctype="multipart/form-data">
+  {% block name %}
+  <div class="form-group">
+    <label>
+      Name:<br>
+      <small class="form-text text-muted">
+        The name of your challenge
+      </small>
+    </label>
+    <input type="text" class="form-control" name="name" value="{{ challenge.name }}" required>
+  </div>
+  {% endblock %}
+
+  {% block category %}
+  <div class="form-group">
+    <label>
+      Category:<br>
+      <small class="form-text text-muted">
+        The category of your challenge
+      </small>
+    </label>
+    <input type="text" class="form-control" name="category" value="{{ challenge.category }}" required>
+  </div>
+  {% endblock %}
+
+  {% block message %}
+  <div class="form-group">
+    <label>
+      Message:<br>
+      <small class="form-text text-muted">
+        Use this to give a brief introduction to your challenge.
+      </small>
+    </label>
+    <textarea id="edit-desc-editor" class="form-control markdown" name="description" rows="10" required>{{ challenge.description }}</textarea>
+  </div>
+  {% endblock %}
+
+  {% block attribution %}
+  <div class="form-group">
+    <label>
+      Flag base:<br>
+      <small class="form-text text-muted">
+        Base flag value.
+      </small>
+    </label>
+    <input type="text" class="form-control" name="flag_base" value="{{ challenge.flag_base }}" required>
+  </div>
+
+  <div class="form-group">
+    <label>
+      Flag Type Mask:<br>
+      <small class="form-text text-muted">
+        1=suffix, 2=leetify, 4=capitalize (combine by summing)
+      </small>
+    </label>
+    <input type="number" class="form-control" name="flag_type" value="{{ challenge.flag_type }}">
+  </div>
+
+  <div class="form-group">
+    <label>
+      Instance type<br>
+    </label>
+
+    <select class="form-control custom-select" name="challenge_type">
+      <option value="socket" {% if challenge.challenge_type == "socket" %}selected{% endif %}>Socket</option>
+      <option value="web" {% if challenge.challenge_type == "web" %}selected{% endif %}>Web</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>
+      Duration (seconds):<br>
+      <small class="form-text text-muted">
+        Lifetime/duration for the instance.
+      </small>
+    </label>
+    <input type="number" class="form-control" name="duration" value="{{ challenge.duration }}">
+  </div>
+
+  <div class="form-group">
+    <label>
+      Repository URL:<br>
+      <small class="form-text text-muted">
+        Source repository associated with this challenge.
+      </small>
+    </label>
+    <input type="url" class="form-control" name="repository" value="{{ challenge.repository }}">
+  </div>
+
+  <div class="form-group">
+    <label>
+      Chart:<br>
+      <small class="form-text text-muted">
+        Chart suffix.
+      </small>
+    </label>
+    <input type="text" class="form-control" name="chart" value="{{ challenge.chart }}">
+  </div>
+
+  <div class="form-group">
+    <label>
+      Chart Version:<br>
+      <small class="form-text text-muted">
+        Version of the chart.
+      </small>
+    </label>
+    <input type="text" class="form-control" name="chart_version" value="{{ challenge.chart_version }}">
+  </div>
+
+  <div class="form-group">
+    <label>
+      Helm Overrides:<br>
+      <small class="form-text text-muted">
+        CLI-style override string.
+      </small>
+    </label>
+    <textarea class="form-control" name="values" rows="5">{{ challenge.values }}</textarea>
+  </div>
+  {% endblock %}
+
+  {% block value %}
+  <div class="form-group">
+    <label>
+      Value:<br>
+      <small class="form-text text-muted">
+        Points rewarded for solving this challenge.
+      </small>
+    </label>
+    <input type="number" class="form-control" name="value" value="{{ challenge.value }}" required>
+  </div>
+  {% endblock %}
+
+  {% block state %}
+  <div class="form-group">
+    <label>
+      State<br>
+      <small class="form-text text-muted">Changes the state of the challenge (e.g. visible, hidden)</small>
+    </label>
+
+    <select class="form-control custom-select" name="state">
+      <option value="visible" {% if challenge.state == "visible" %}selected{% endif %}>Visible</option>
+      <option value="hidden" {% if challenge.state == "hidden" %}selected{% endif %}>Hidden</option>
+    </select>
+  </div>
+  {% endblock %}
+
+  {% block type %}
+  <input type="hidden" name="type" value="instanced">
+  {% endblock %}
+
+  {% block submit %}
+  <div class="form-group">
+    <button class="btn btn-primary float-right update-challenge-submit" type="submit">Update</button>
+  </div>
+  {% endblock %}
+</form>
+
+{% block footer %}
+{% endblock %}

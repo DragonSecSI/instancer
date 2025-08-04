@@ -1,0 +1,8 @@
+{
+  "name": "Instancer",
+  "route": "/admin/plugins/instancer",
+  "description": "Configure the Instancer",
+  "author": "DragonSec SI",
+  "version": "0.1.0"
+}
+

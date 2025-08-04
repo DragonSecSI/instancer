@@ -1,0 +1,154 @@
+{% extends "admin/challenges/create.html" %}
+
+{% block header %}
+{% endblock %}
+
+<form method="POST" action="{{ script_root }}/admin/challenges/new" enctype="multipart/form-data">
+  {% block name %}
+  <div class="form-group">
+    <label>
+      Name:<br>
+      <small class="form-text text-muted">
+        The name of your challenge
+      </small>
+    </label>
+    <input type="text" class="form-control" name="name" placeholder="Enter challenge name" required>
+  </div>
+  {% endblock %}
+
+  {% block category %}
+  <div class="form-group">
+    <label>
+      Category:<br>
+      <small class="form-text text-muted">
+        The category of your challenge
+      </small>
+    </label>
+    <input type="text" class="form-control" name="category" placeholder="Enter challenge category" required>
+  </div>
+  {% endblock %}
+
+  {% block message %}
+  <div class="form-group">
+    <label>
+      Message:<br>
+      <small class="form-text text-muted">
+        Use this to give a brief introduction to your challenge.
+      </small>
+    </label>
+    <textarea id="new-desc-editor" class="form-control markdown" name="description" rows="10" required></textarea>
+  </div>
+  {% endblock %}
+
+  {% block attribution %}
+  <div class="form-group">
+    <label>
+      Flag base:<br>
+      <small class="form-text text-muted">
+        Base flag value (processed according to flag_type).
+      </small>
+    </label>
+    <input type="text" class="form-control" name="flag_base" placeholder="Enter flag" required>
+  </div>
+
+  <div class="form-group">
+    <label>
+      Flag Type Mask:<br>
+      <small class="form-text text-muted">
+        1=suffix, 2=leetify, 4=capitalize (combine by summing)
+      </small>
+    </label>
+    <input type="number" class="form-control" name="flag_type" value="0" min="0" max="7">
+  </div>
+
+  <div class="form-group">
+    <label>
+      Instance type<br>
+    </label>
+
+    <select class="form-control custom-select" name="challenge_type">
+      <option value="web" selected>Web</option>
+      <option value="socket">Socket</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>
+      Duration (seconds):<br>
+      <small class="form-text text-muted">
+        Lifetime/duration for the instance.
+      </small>
+    </label>
+    <input type="number" class="form-control" name="duration" value="1800">
+  </div>
+
+  <div class="form-group">
+    <label>
+      Repository URL:<br>
+      <small class="form-text text-muted">
+        Source repository associated with this challenge.
+      </small>
+    </label>
+    <input type="url" class="form-control" name="repository" placeholder="oci://registry.example.com/charts" >
+  </div>
+
+  <div class="form-group">
+    <label>
+      Chart:<br>
+      <small class="form-text text-muted">
+        Chart suffix.
+      </small>
+    </label>
+    <input type="text" class="form-control" name="chart" placeholder="chart name">
+  </div>
+
+  <div class="form-group">
+    <label>
+      Chart Version:<br>
+      <small class="form-text text-muted">
+        Version of the chart.
+      </small>
+    </label>
+    <input type="text" class="form-control" name="chart_version" placeholder="v1.2.3">
+  </div>
+
+  <div class="form-group">
+    <label>
+      Helm Overrides:<br>
+      <small class="form-text text-muted">
+        CLI-style override string.
+      </small>
+    </label>
+    <textarea class="form-control" name="values" rows="5" placeholder="key.subkey=value"></textarea>
+  </div>
+  {% endblock %}
+
+  {% block value %}
+  <div class="form-group">
+    <label>
+      Value:<br>
+      <small class="form-text text-muted">
+        Points rewarded for solving this challenge.
+      </small>
+    </label>
+    <input type="number" class="form-control" name="value" placeholder="Enter value" required>
+  </div>
+  {% endblock %}
+
+  {% block state %}
+  <input type="hidden" name="state" value="hidden">
+  {% endblock %}
+
+  {% block type %}
+  <input type="hidden" name="type" value="instanced">
+  {% endblock %}
+
+  {% block submit %}
+  <div class="form-group">
+    <button class="btn btn-primary float-right create-challenge-submit" type="submit">Create</button>
+  </div>
+  {% endblock %}
+</form>
+
+{% block footer %}
+{% endblock %}

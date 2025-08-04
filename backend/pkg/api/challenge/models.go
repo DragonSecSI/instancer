@@ -49,6 +49,11 @@ type ChallengeNewRequest struct {
 	Challenge *Challenge `in:"body;nonzero"`
 }
 
+type ChallengePutRequest struct {
+	ID        uint       `in:"path=id"`
+	Challenge *Challenge `in:"body;nonzero"`
+}
+
 type ChallengeResponse struct {
 	ID          uint                 `json:"id"`
 	Name        string               `json:"name"`

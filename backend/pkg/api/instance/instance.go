@@ -189,7 +189,10 @@ func (rs InstanceApi) NewInstance(w http.ResponseWriter, r *http.Request) {
 	}
 
 	flag := helpers.Flag.Process(challenge.Flag, challenge.FlagType)
-	values := strings.Split(strings.TrimSpace(challenge.Values), "\n")
+	values := strings.Split(challenge.Values, "\n")
+	for i, v := range values {
+		values[i] = strings.TrimSpace(v)
+	}
 	if values[len(values)-1] == "" {
 		values[len(values)-1] = "flag.flag=" + flag
 	} else {
