@@ -6,8 +6,28 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.types import Integer, String
 from sqlalchemy.orm import relationship
 import requests
+import time
 
 from .config import get_instancer_api_url, get_instancer_api_token, get_instancer_public_url
+
+
+def ctf_has_started():
+    start = get_config("start")
+    if start:
+        try:
+            start = int(start)
+        except ValueError:
+            return True
+
+        now = int(time.time())
+        return now >= start
+    return True
+
+def is_admin():
+    user = get_current_user()
+    if user:
+        return user.type == "admin"
+    return False
 
 
 class InstancerTokenTable(db.Model):
@@ -25,9 +45,11 @@ instancer_bp = Blueprint("instancer_plugin", __name__)
 
 @instancer_bp.route("/instancer")
 def instancer_portal_redirect():
-    # Not logged in? Redirect to login with next param.
     if not authed():
         return redirect(url_for("auth.login", next=request.path))
+
+    if not ctf_has_started() and not is_admin():
+        return redirect(url_for("challenges.listing"))
 
     user = get_current_user()
     mode = get_config("user_mode")
