@@ -61,11 +61,11 @@ func (inst *Instancer) CronRun() error {
 				if err := models.InstanceUpdate(inst.DB, instance); err != nil {
 					inst.Logger.Error().Err(err).Msgf("Failed to update instance status for: %s", instance.Name)
 				}
+
+				metrics.InstancesDeletedCounter.Inc()
 			}(inst, &instance)
 		}
 	}
-
-	metrics.InstancesDeletedCounter.Inc()
 
 	if count > 0 {
 		inst.Logger.Info().Int("instances_deleted", count).Msg("Instance cleanup completed")
