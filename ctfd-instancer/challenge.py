@@ -17,6 +17,7 @@ class CTFdInstancedChallenge(Challenges):
     flag_base = db.Column(db.String(128), nullable=False)
     flag_type = db.Column(db.Integer, nullable=False, default=0) # Mask: 1 suffix, 2 leetify, 4 capitalize
     duration = db.Column(db.Integer, nullable=True, default=1800)  # Duration in seconds
+    cooldown = db.Column(db.Integer, nullable=True, default=0)  # Cooldown in seconds
     repository = db.Column(db.String(256), nullable=True)  # Repository URL for the challenges
     chart = db.Column(db.String(128), nullable=True)  # Chart suffix for the challenge
     chart_version = db.Column(db.String(32), nullable=True)  # Version of the chart
@@ -72,6 +73,7 @@ class CTFdInstancedTypeChallenge(CTFdStandardChallenge):
                 "flag": challenge.flag_base,
                 "flag_type": challenge.flag_type,
                 "duration": challenge.duration,
+                "cooldown": challenge.cooldown,
                 "repository": challenge.repository,
                 "chart": challenge.chart,
                 "chart_version": challenge.chart_version,
@@ -100,7 +102,7 @@ class CTFdInstancedTypeChallenge(CTFdStandardChallenge):
         data = request.form or request.get_json()
 
         for attr, value in data.items():
-            if attr in ("flag_type", "duration"):
+            if attr in ("flag_type", "duration", "cooldown"):
                 try:
                     value = int(value)
                 except (ValueError, TypeError):
@@ -120,6 +122,7 @@ class CTFdInstancedTypeChallenge(CTFdStandardChallenge):
                 "flag": challenge.flag_base,
                 "flag_type": challenge.flag_type,
                 "duration": challenge.duration,
+                "cooldown": challenge.cooldown,
                 "repository": challenge.repository,
                 "chart": challenge.chart,
                 "chart_version": challenge.chart_version,

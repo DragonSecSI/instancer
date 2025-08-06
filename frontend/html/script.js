@@ -249,7 +249,8 @@ function startInstance(challengeId) {
 		console.error(`Failed to start challenge: ${xhr.status} ${xhr.statusText}`);
 		let e = document.getElementById('error');
 		if (xhr.status === 409) {
-			e.textContent = '⚠️ Error: Challenge with the same ID already started';
+			let error = JSON.parse(xhr.responseText);
+			e.textContent = `⚠️ Error: ${error.error} (${xhr.status})`;
 		} else if (xhr.status === 404) {
 			e.textContent = '⚠️ Error: Challenge not found';
 		} else {

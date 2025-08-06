@@ -58,6 +58,7 @@ func InstanceGetByTeamID(db *gorm.DB, teamID uint, page int, pagesize int) ([]In
 	var instances []Instance
 	err := db.
 		Scopes(database.Paginate(db, page, pagesize)).
+		Preload("Challenge").
 		Where("team_id = ?", teamID).
 		Order("id desc").
 		Find(&instances).

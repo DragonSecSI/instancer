@@ -36,6 +36,7 @@ type Challenge struct {
 	Flag     string            `gorm:"not null"`
 	FlagType ChallengeFlagType `gorm:"not null"`
 	Duration int               `gorm:"not null"`
+	Cooldown int               `gorm:"not null;default:0"`
 
 	Repository   string `gorm:"not null"`
 	Chart        string `gorm:"not null"`

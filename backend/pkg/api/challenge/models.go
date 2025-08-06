@@ -22,6 +22,7 @@ type Challenge struct {
 	Flag         string                   `json:"flag"`
 	FlagType     models.ChallengeFlagType `json:"flag_type"`
 	Duration     int                      `json:"duration"`
+	Cooldown     int                      `json:"cooldown"`
 	Repository   string                   `json:"repository"`
 	Chart        string                   `json:"chart"`
 	ChartVersion string                   `json:"chart_version"`
@@ -38,6 +39,7 @@ func (c Challenge) ToModel() models.Challenge {
 		Flag:         c.Flag,
 		FlagType:     c.FlagType,
 		Duration:     c.Duration,
+		Cooldown:     c.Cooldown,
 		Repository:   c.Repository,
 		Chart:        c.Chart,
 		ChartVersion: c.ChartVersion,
@@ -61,6 +63,7 @@ type ChallengeResponse struct {
 	Category    string               `json:"category"`
 	Type        models.ChallengeType `json:"type"`
 	Duration    int                  `json:"duration"`
+	Cooldown    int                  `json:"cooldown"`
 }
 
 func newChallengeResponseList(challs []models.Challenge) []ChallengeResponse {
@@ -73,6 +76,7 @@ func newChallengeResponseList(challs []models.Challenge) []ChallengeResponse {
 			Category:    chall.Category,
 			Type:        chall.Type,
 			Duration:    chall.Duration,
+			Cooldown:    chall.Cooldown,
 		})
 	}
 	return result
@@ -86,5 +90,6 @@ func newChallengeResponse(chall models.Challenge) ChallengeResponse {
 		Category:    chall.Category,
 		Type:        chall.Type,
 		Duration:    chall.Duration,
+		Cooldown:    chall.Cooldown,
 	}
 }

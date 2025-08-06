@@ -10,6 +10,7 @@ flag_type: # Set any of the following to enable the flag mangling
   - "leetify"
   - "capitalize"
 duration: 1800
+cooldown: 0
 
 repository: "oci://registry:5000/charts"
 chart: "pwn" # The same as the charts folder name

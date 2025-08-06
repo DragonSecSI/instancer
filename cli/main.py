@@ -30,6 +30,7 @@ if __name__ == "__main__":
     argparser.add_argument("--category", type=str, help="Category override for the challenge")
     argparser.add_argument("--remoteid", type=str, help="Remote challenge ID override for the challenge")
     argparser.add_argument("--duration", type=int, help="Duration override for the challenge in seconds")
+    argparser.add_argument("--cooldown", type=int, help="Cooldown override for the challenge in seconds")
     argparser.add_argument("--flag", type=str, help="Flag override for the challenge")
     argparser.add_argument("--image", type=str, help="Image override for the challenge")
     argparser.add_argument("--tag", type=str, help="Tag override for the challenge")
@@ -70,6 +71,7 @@ if __name__ == "__main__":
         "flag": challenge["flag"],
         "flag_type": flag_parse_types(challenge["flag_type"]),
         "duration": challenge.get("duration", 1800),
+        "cooldown": challenge.get("cooldown", 0),
         "repository": challenge.get("repository", "oci://registry:5000/charts"),
         "chart": challenge["chart"],
         "chart_version": challenge["chart_version"],
@@ -81,6 +83,8 @@ if __name__ == "__main__":
         payload["category"] = args.category
     if args.duration:
         payload["duration"] = args.duration
+    if args.cooldown:
+        payload["cooldown"] = args.cooldown
     if args.flag:
         payload["flag"] = args.flag
     if args.chart:

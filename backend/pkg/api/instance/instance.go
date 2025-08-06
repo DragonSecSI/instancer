@@ -157,15 +157,28 @@ func (rs InstanceApi) NewInstance(w http.ResponseWriter, r *http.Request) {
 	req := r.Context().Value(httpin.Input).(*InstanceRequest)
 
 	duplicate := false
+	cooldownTime := 0
 	for _, inst := range instances {
-		if inst.Active && inst.ChallengeID == req.ID && time.Since(inst.CreatedAt).Seconds() < float64(inst.Duration)-60 { // Allow a grace period of 2 minutes
-			duplicate = true
-			break
+		if inst.ChallengeID == req.ID {
+			if inst.Active && time.Since(inst.CreatedAt).Seconds() < float64(inst.Duration)-60 { // Allow a grace period of 1 minute
+				duplicate = true
+				break
+			}
+			if inst.Challenge.Cooldown > 0 && time.Since(inst.CreatedAt).Seconds() < float64(inst.Challenge.Cooldown) {
+				cooldownTime = int(time.Until(inst.CreatedAt.Add(time.Duration(inst.Challenge.Cooldown) * time.Second)).Seconds())
+				break
+			}
 		}
 	}
 	if duplicate {
 		rs.Logger.Warn().Str("team", team.Name).Uint("teamid", team.ID).Uint("challenge", req.ID).Msg("Instance already exists for this challenge")
 		helpers.Api.Response.JsonError(w, &rs.Logger, "Instance already exists for this challenge", http.StatusConflict)
+		return
+	}
+	if cooldownTime > 0 {
+		cooldownTimeStr := helpers.Strings.FuzzyTime(cooldownTime)
+		rs.Logger.Warn().Str("team", team.Name).Uint("teamid", team.ID).Uint("challenge", req.ID).Msg("Instance is on cooldown for this challenge")
+		helpers.Api.Response.JsonError(w, &rs.Logger, "This challenge type is on cooldown for "+cooldownTimeStr, http.StatusConflict)
 		return
 	}
 
