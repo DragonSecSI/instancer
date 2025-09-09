@@ -135,6 +135,23 @@ section.content {
   }
 }
 
+.running {
+    animation: loading-fade 1s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes loading-fade {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #111;
