@@ -1,1 +1,10 @@
 {% extends "challenge.html" %}
+
+{% block connection_info %}
+    <button
+        class="challenge-submit btn btn-outline-secondary w-100 h-100" type="submit"
+        @click="location.href='/instancer?chall={{ challenge.id }}'"
+    >
+        {% trans %}Start instance{% endtrans %}
+    </button>
+{% endblock %}

@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 import requests
 import time
 
+from .challenge import CTFdInstancedChallenge
 from .config import get_instancer_api_url, get_instancer_api_token, get_instancer_public_url
 
 
@@ -51,6 +52,19 @@ def instancer_portal_redirect():
     if not ctf_has_started() and not is_admin():
         return redirect(url_for("challenges.listing"))
 
+    cid = request.args.get("chall")
+    if cid:
+        try:
+            cid = int(cid)
+        except ValueError:
+            return "Invalid challenge ID.", 400
+
+        chall = CTFdInstancedChallenge.query.filter_by(id=cid).first()
+        if not chall:
+            return "Challenge not found or not an instanced challenge.", 404
+
+        cid = chall.instancer_id
+
     user = get_current_user()
     mode = get_config("user_mode")
 
@@ -81,6 +95,8 @@ def instancer_portal_redirect():
     if token:
         instancer_base = get_instancer_public_url()
         instancer_url = f"{instancer_base}?token={token}"
+        if cid:
+            instancer_url += f"&chall={cid}"
         return redirect(instancer_url)
     else:
         # No token found, fallback or error

@@ -43,11 +43,6 @@ async function show_error(message, response = null) {
   e.classList.remove("hidden");
 }
 
-function refreshTimed() {
-  refresh();
-  setTimeout(refreshTimed, 60000);
-}
-
 async function refresh() {
   let e = document.getElementById("error");
   try {
@@ -376,11 +371,18 @@ function getFuzzyDuration(timestring, duration) {
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     await getConfig();
-    refreshTimed();
+    await refresh();
+    setInterval(refresh, 60000);
   } catch (error) {
     console.error("Failed to initialize application:", error);
     await show_error(`Failed to initialize application - ${error.message}`);
   }
+
   let message = document.getElementById("message");
   message.textContent = "Welcome to the instancer!";
+
+  const chall = new URLSearchParams(window.location.search).get("chall");
+  if (chall) {
+    startInstance(Number(chall));
+  }
 });
