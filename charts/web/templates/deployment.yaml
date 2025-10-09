@@ -35,10 +35,10 @@ spec:
       {{- end }}
       automountServiceAccountToken: false
       securityContext:
-        runAsNonRoot: {{ .Values.pod.securityContext.runAsNonRoot | default true }}
-        runAsUser: {{ .Values.pod.securityContext.runAsUser | default 1337 }}
-        runAsGroup: {{ .Values.pod.securityContext.runAsGroup | default 1337 }}
-        fsGroup: {{ .Values.pod.securityContext.fsGroup | default 1337 }}
+        runAsNonRoot: {{ .Values.pod.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.pod.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.pod.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.pod.securityContext.fsGroup }}
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -46,12 +46,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            privileged: false
-            capabilities:
-              drop:
-                - ALL
+            allowPrivilegeEscalation: {{ .Values.pod.securityContext.allowPrivilegeEscalation }}
+            readOnlyRootFilesystem: {{ .Values.pod.securityContext.readOnlyRootFilesystem }}
+            privileged: {{ .Values.pod.securityContext.privileged }}
           ports:
             - name: web
               containerPort: {{ .Values.pod.port }}
