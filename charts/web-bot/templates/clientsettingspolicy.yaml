@@ -1,0 +1,13 @@
+apiVersion: gateway.nginx.org/v1alpha1
+kind: ClientSettingsPolicy
+metadata:
+  name: {{ .Release.Name }}-clientsettingspolicy
+  labels:
+    app.kubernetes.io/managed-by: "instancer"
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: {{ .Release.Name }}-httproute
+  body:
+    maxSize: "100m"

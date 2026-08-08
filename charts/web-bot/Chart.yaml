@@ -1,0 +1,7 @@
+apiVersion: v2
+name: web-bot
+description: Template WEB with BOT challenge chart
+
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

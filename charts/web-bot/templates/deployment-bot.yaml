@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-bot
+  labels:
+    app.kubernetes.io/managed-by: "instancer"
+    {{- with .Values.deployment.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.deployment.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/managed-by: "instancer"
+      app.kubernetes.io/name: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.bot.annotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        app.kubernetes.io/managed-by: "instancer"
+        app.kubernetes.io/name: {{ .Release.Name }}
+        {{- with .Values.bot.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: {{ .Values.bot.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.bot.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.bot.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.bot.securityContext.fsGroup }}
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: {{ .Release.Name }}-bot
+          image: "{{ .Values.image.repository }}:{{ .Values.image.bottag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.bot.securityContext.allowPrivilegeEscalation }}
+            readOnlyRootFilesystem: {{ .Values.bot.securityContext.readOnlyRootFilesystem }}
+            privileged: {{ .Values.bot.securityContext.privileged }}
+          ports:
+            - name: web
+              containerPort: {{ .Values.bot.port }}
+              protocol: TCP
+          env:
+          {{- if .Values.bot.targetenvkey }}
+            - name: {{ .Values.bot.targetenvkey }}
+              value: "http://{{ .Release.Name }}:{{ .Values.service.port }}"
+          {{- end }}
+          {{- if .Values.flag.bot.envkey }}
+            - name: {{ .Values.flag.bot.envkey }}
+              value: "{{ .Values.flag.flag }}"
+          {{- end }}
+            {{- with .Values.bot.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if or .Values.flag.bot.path .Values.bot.volumes }}
+          volumeMounts:
+            {{- if .Values.flag.bot.path }}
+            - name: flag-volume
+              mountPath: {{ .Values.flag.bot.path }}
+              subPath: {{ splitList "/" .Values.flag.bot.path | last | quote }}
+            {{- end }}
+            {{- range .Values.bot.volumes }}
+            - name: {{ .name }}
+              mountPath: {{ .path }}
+            {{- end }}
+          {{- end }}
+          resources:
+            requests:
+              memory: {{ .Values.bot.resources.requests.memory | default "64Mi" }}
+              cpu: {{ .Values.bot.resources.requests.cpu | default "5m" }}
+            limits:
+              memory: {{ .Values.bot.resources.limits.memory | default "64Mi" }}
+              cpu: {{ .Values.bot.resources.limits.cpu | default "50m" }}
+      {{- if or .Values.flag.bot.path .Values.bot.volumes }}
+      volumes:
+        {{- if .Values.flag.bot.path }}
+        - name: flag-volume
+          configMap:
+            name: {{ .Release.Name }}-flag
+        {{- end }}
+        {{- range .Values.bot.volumes }}
+        - name: {{ .name }}
+          emptyDir:
+            sizeLimit: {{ .size | default "50Mi" }}
+        {{- end }}
+      {{- end }}
+

@@ -1,0 +1,94 @@
+image:
+  repository: registry.dctf.si/web/nessus
+  pullPolicy: Always
+  tag: latest
+  bottag: bot
+
+imagePullSecrets:
+  - name: dctf
+
+pod:
+  annotations: {}
+  labels: {}
+  port: 8000
+  env: []
+  targetenvkey: "TARGET_URL"
+  # Example
+  #  - name: "DEMO"
+  #    value: "demo"
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1337
+    runAsGroup: 1337
+    fsGroup: 1337
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  volumes:
+    - name: "db"
+      path: "/app/db"
+      size: "50Mi"
+    - name: "tmp"
+      path: "/tmp"
+      size: "100Mi"
+bot:
+  annotations: {}
+  labels: {}
+  port: 8000
+  env: []
+  targetenvkey: "TARGET_URL"
+  # Example
+  #  - name: "DEMO"
+  #    value: "demo"
+  securityContext:
+    runAsNonRoot: false
+    runAsUser: 0
+    runAsGroup: 0
+    fsGroup: 0
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: false
+  resources:
+    requests:
+      cpu: 10m
+      memory: 512Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
+  volumes:
+    - name: "tmp"
+      path: "/tmp"
+      size: "50Mi"
+
+deployment:
+  annotations: {}
+  labels: {}
+
+service:
+  annotations: {}
+  labels: {}
+  type: ClusterIP
+  port: 80
+
+httproute:
+  annotations: {}
+  labels: {}
+  hostSuffix: "web.vuln.si"
+  gateway: "vuln"
+  httpSectionName: "http-web"
+  httpsSectionName: "https-web"
+
+flag:
+  flag: "flag{unset}"
+  envkey: "" # If set, the flag will be injected to this environment variable
+  path: "" # If set, the flag will be written to this file path
+  bot:
+    envkey: "FLAG" # If set, the flag will be injected to this environment variable
+    path: "" # If set, the flag will be written to this file path

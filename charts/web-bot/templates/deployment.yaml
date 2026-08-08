@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app.kubernetes.io/managed-by: "instancer"
+    {{- with .Values.deployment.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.deployment.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/managed-by: "instancer"
+      app.kubernetes.io/name: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.pod.annotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        app.kubernetes.io/managed-by: "instancer"
+        app.kubernetes.io/name: {{ .Release.Name }}
+        {{- with .Values.pod.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: {{ .Values.pod.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.pod.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.pod.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.pod.securityContext.fsGroup }}
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.pod.securityContext.allowPrivilegeEscalation }}
+            readOnlyRootFilesystem: {{ .Values.pod.securityContext.readOnlyRootFilesystem }}
+            privileged: {{ .Values.pod.securityContext.privileged }}
+          ports:
+            - name: web
+              containerPort: {{ .Values.pod.port }}
+              protocol: TCP
+          {{- if or .Values.flag.envkey .Values.pod.env .Values.pod.targetenvkey }}
+          env:
+          {{- if .Values.pod.targetenvkey }}
+            - name: {{ .Values.pod.targetenvkey }}
+              value: "http://{{ .Release.Name }}:{{ .Values.service.port }}"
+          {{- end }}
+          {{- if .Values.flag.envkey }}
+            - name: {{ .Values.flag.envkey }}
+              value: "{{ .Values.flag.flag }}"
+          {{- end }}
+            {{- with .Values.pod.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if or .Values.flag.path .Values.pod.volumes }}
+          volumeMounts:
+            {{- if .Values.flag.path }}
+            - name: flag-volume
+              mountPath: {{ .Values.flag.path }}
+              subPath: {{ splitList "/" .Values.flag.path | last | quote }}
+            {{- end }}
+            {{- range .Values.pod.volumes }}
+            - name: {{ .name }}
+              mountPath: {{ .path }}
+            {{- end }}
+          {{- end }}
+          resources:
+            requests:
+              memory: {{ .Values.pod.resources.requests.memory | default "64Mi" }}
+              cpu: {{ .Values.pod.resources.requests.cpu | default "5m" }}
+            limits:
+              memory: {{ .Values.pod.resources.limits.memory | default "64Mi" }}
+              cpu: {{ .Values.pod.resources.limits.cpu | default "50m" }}
+      {{- if or .Values.flag.path .Values.pod.volumes }}
+      volumes:
+        {{- if .Values.flag.path }}
+        - name: flag-volume
+          configMap:
+            name: {{ .Release.Name }}-flag
+        {{- end }}
+        {{- range .Values.pod.volumes }}
+        - name: {{ .name }}
+          emptyDir:
+            sizeLimit: {{ .size | default "50Mi" }}
+        {{- end }}
+      {{- end }}
+
