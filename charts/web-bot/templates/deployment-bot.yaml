@@ -15,7 +15,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/managed-by: "instancer"
-      app.kubernetes.io/name: {{ .Release.Name }}
+      app.kubernetes.io/name: "{{ .Release.Name }}-bot"
   template:
     metadata:
       annotations:
@@ -24,7 +24,7 @@ spec:
         {{- end }}
       labels:
         app.kubernetes.io/managed-by: "instancer"
-        app.kubernetes.io/name: {{ .Release.Name }}
+        app.kubernetes.io/name: "{{ .Release.Name }}-bot"
         {{- with .Values.bot.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

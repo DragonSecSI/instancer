@@ -57,7 +57,7 @@ spec:
           env:
           {{- if .Values.pod.targetenvkey }}
             - name: {{ .Values.pod.targetenvkey }}
-              value: "http://{{ .Release.Name }}:{{ .Values.service.port }}"
+              value: "http://{{ .Release.Name }}-bot:{{ .Values.service.port }}"
           {{- end }}
           {{- if .Values.flag.envkey }}
             - name: {{ .Values.flag.envkey }}
